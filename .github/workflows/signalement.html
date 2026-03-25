@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signalement – Problèmes en salle</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2333;
+    --border: #2a2f42;
+    --accent: #4f8cff;
+    --accent2: #ff6b4a;
+    --green: #3ecf8e;
+    --text: #e8eaf0;
+    --muted: #6b7290;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,140,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,140,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 620px;
+  }
+
+  header {
+    margin-bottom: 36px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(79,140,255,0.12);
+    border: 1px solid rgba(79,140,255,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+
+  .badge::before { content: '●'; font-size: 8px; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Room selector */
+  .room-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+
+  select, input[type="text"], textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7290' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  select:focus, input[type="text"]:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,140,255,0.15);
+  }
+
+  option { background: #1e2333; }
+
+  /* Room preview pill */
+  .room-preview {
+    margin-top: 16px;
+    background: rgba(79,140,255,0.08);
+    border: 1px solid rgba(79,140,255,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .room-preview-label { font-size: 13px; color: var(--muted); }
+
+  .room-preview-code {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  /* Categories */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .cat-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .cat-btn:hover {
+    border-color: var(--accent);
+    background: rgba(79,140,255,0.06);
+  }
+
+  .cat-btn.active {
+    border-color: var(--accent);
+    background: rgba(79,140,255,0.12);
+    box-shadow: 0 0 0 3px rgba(79,140,255,0.12);
+  }
+
+  .cat-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+  .cat-name { font-size: 13px; font-weight: 500; }
+
+  /* Problem types */
+  .problems-wrap { display: none; }
+  .problems-wrap.visible { display: block; }
+
+  .prob-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .prob-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+
+  .prob-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+  .prob-chip.active {
+    background: rgba(255,107,74,0.15);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+  }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), #6366f1);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Spinner */
+  .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Success overlay */
+  .success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,12,20,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+
+  .success-overlay.show { display: flex; }
+
+  .success-card {
+    background: var(--surface);
+    border: 1px solid var(--green);
+    border-radius: 20px;
+    padding: 48px 40px;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-icon {
+    width: 64px; height: 64px;
+    background: rgba(62,207,142,0.12);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 30px;
+  }
+
+  .success-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .success-msg { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  .success-room {
+    display: inline-block;
+    background: rgba(62,207,142,0.12);
+    border: 1px solid rgba(62,207,142,0.3);
+    color: var(--green);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    border-radius: 8px;
+    padding: 4px 14px;
+    margin: 10px 0;
+  }
+
+  .btn-new {
+    margin-top: 24px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .btn-new:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-pdf {
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--green), #2bb57a);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 24px;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-pdf:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-pdf:active { transform: translateY(0); }
+
+  .ref-number {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Error */
+  .error-msg {
+    color: var(--accent2);
+    font-size: 13px;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .error-msg.show { display: block; }
+
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 20px 16px; }
+    .room-grid { grid-template-columns: 1fr 1fr; }
+    .cat-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">Établissement scolaire</div>
+    <h1>Signalement<br><span>d'un problème en salle</span></h1>
+    <p class="subtitle">Signalez rapidement un dysfonctionnement.<br>Les informations sont transmises à l'équipe technique.</p>
+  </header>
+
+  <form id="reportForm">
+
+    <!-- Salle -->
+    <div class="card">
+      <div class="card-title">📍 Identification de la salle</div>
+      <div class="room-grid">
+        <div class="field-group">
+          <label>Bâtiment</label>
+          <select id="batiment" required>
+            <option value="">—</option>
+            <option>A</option><option>B</option><option>C</option><option>D</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Étage</label>
+          <select id="etage" required>
+            <option value="">—</option>
+            <option value="1">1er étage</option>
+            <option value="2">2e étage</option>
+            <option value="3">3e étage</option>
+            <option value="4">4e étage</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Numéro de salle</label>
+          <select id="salle" required>
+            <option value="">—</option>
+            <option value="01">01</option><option value="02">02</option>
+            <option value="03">03</option><option value="04">04</option>
+            <option value="05">05</option><option value="06">06</option>
+            <option value="07">07</option><option value="08">08</option>
+            <option value="09">09</option><option value="10">10</option>
+          </select>
+        </div>
+      </div>
+      <div class="room-preview">
+        <span class="room-preview-label">Code salle généré</span>
+        <span class="room-preview-code" id="roomCode">—</span>
+      </div>
+    </div>
+
+    <!-- Catégorie -->
+    <div class="card">
+      <div class="card-title">🔎 Catégorie du problème</div>
+      <div class="cat-grid">
+        <button type="button" class="cat-btn" data-cat="Informatique">
+          <span class="cat-icon">🖥️</span>
+          <span class="cat-name">Informatique</span>
+        </button>
+        <button type="button" class="cat-btn" data-cat="Mobilier">
+          <span class="cat-icon">🪑</span>
+          <span class="cat-name">Mobilier</span>
+        </button>
+        <button type="button" class="cat-btn" data-cat="Électricité / Éclairage">
+          <span class="cat-icon">💡</span>
+          <span class="cat-name">Électricité / Lumière</span>
+        </button>
+        <button type="button" class="cat-btn" data-cat="Matériel divers">
+          <span class="cat-icon">🔧</span>
+          <span class="cat-name">Matériel divers</span>
+        </button>
+        <button type="button" class="cat-btn" data-cat="Autre">
+          <span class="cat-icon">📋</span>
+          <span class="cat-name">Autre</span>
+        </button>
+      </div>
+      <input type="hidden" id="categorie">
+
+      <!-- Types de problèmes dynamiques -->
+      <div class="problems-wrap" id="problemsWrap">
+        <label style="margin-bottom:10px;display:block;margin-top:18px;">Type de problème</label>
+        <div class="prob-list" id="probList"></div>
+        <input type="hidden" id="typeProbleme">
+      </div>
+    </div>
+
+    <!-- Description + Déclarant -->
+    <div class="card">
+      <div class="card-title">📝 Détails</div>
+      <div class="field-group" style="margin-bottom:16px;">
+        <label>Description complémentaire <span style="opacity:0.5">(optionnel)</span></label>
+        <textarea id="description" placeholder="Décrivez le problème plus précisément si nécessaire…"></textarea>
+      </div>
+      <div class="field-group">
+        <label>Votre nom <span style="opacity:0.5">(optionnel)</span></label>
+        <input type="text" id="declarant" placeholder="Ex : M. Dupont">
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg">⚠️ Veuillez remplir tous les champs obligatoires (salle, catégorie et type de problème).</div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">
+      <span id="btnText">Envoyer le signalement</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </form>
+
+  <footer>Formulaire interne — Les données sont enregistrées dans Google Sheets</footer>
+</div>
+
+<!-- Overlay succès -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Signalement envoyé !</div>
+    <div class="success-msg">Le problème de la salle</div>
+    <div class="success-room" id="successRoom">—</div>
+    <div class="success-msg">a bien été transmis à l'équipe technique. Merci !</div>
+    <div class="ref-number" id="refNumber">Réf. —</div>
+    <button class="btn-pdf" id="btnPdf">📄 Télécharger l'attestation PDF</button>
+    <button class="btn-new" id="btnNew">Faire un autre signalement</button>
+  </div>
+</div>
+
+<script>
+  // ⚠️ REMPLACEZ par l'URL de votre Google Apps Script déployé
+  const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_ICI/exec";
+
+  // ⚠️ NOM DE VOTRE ÉTABLISSEMENT
+  const NOM_ETABLISSEMENT = "Établissement Scolaire";
+
+  // Stockage global du dernier signalement pour le PDF
+  let lastPayload = {};
+  let lastRef = "";
+
+  function genRef() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return `SIG-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${Math.floor(Math.random()*9000+1000)}`;
+  }
+
+  const problems = {
+    "Informatique": [
+      "Ordinateur en panne","Ordinateur lent","Réseau / Wi-Fi","Vidéoprojecteur",
+      "Écran défectueux","Clavier / Souris","Logiciel","Imprimante","Autre informatique"
+    ],
+    "Mobilier": [
+      "Table cassée","Chaise cassée","Bureau professeur","Armoire abîmée",
+      "Porte endommagée","Fenêtre","Stores","Tableau blanc","Autre mobilier"
+    ],
+    "Électricité / Éclairage": [
+      "Lumière défectueuse","Prise électrique cassée","Disjoncteur",
+      "Interrupteur hors service","Câblage apparent","Autre électricité"
+    ],
+    "Matériel divers": [
+      "Serrure / Porte","Climatisation / Chauffage","Plomberie",
+      "Nettoyage urgent","Affichage mural","Autre matériel"
+    ],
+    "Autre": ["À préciser dans la description"]
+  };
+
+  // Room code
+  ['batiment','etage','salle'].forEach(id => {
+    document.getElementById(id).addEventListener('change', updateRoomCode);
+  });
+
+  function updateRoomCode() {
+    const b = document.getElementById('batiment').value;
+    const e = document.getElementById('etage').value;
+    const s = document.getElementById('salle').value;
+    document.getElementById('roomCode').textContent =
+      (b && e && s) ? `${b}${e}${s}` : '—';
+  }
+
+  // Categories
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      document.getElementById('categorie').value = cat;
+      document.getElementById('typeProbleme').value = '';
+      renderProblems(cat);
+    });
+  });
+
+  function renderProblems(cat) {
+    const wrap = document.getElementById('problemsWrap');
+    const list = document.getElementById('probList');
+    list.innerHTML = '';
+    wrap.classList.add('visible');
+    (problems[cat] || []).forEach(p => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'prob-chip';
+      chip.textContent = p;
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        document.getElementById('typeProbleme').value = p;
+      });
+      list.appendChild(chip);
+    });
+  }
+
+  // Submit
+  document.getElementById('reportForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('errorMsg');
+    err.classList.remove('show');
+
+    const b = document.getElementById('batiment').value;
+    const et = document.getElementById('etage').value;
+    const s = document.getElementById('salle').value;
+    const cat = document.getElementById('categorie').value;
+    const type = document.getElementById('typeProbleme').value;
+
+    if (!b || !et || !s || !cat || !type) {
+      err.classList.add('show');
+      return;
+    }
+
+    const roomCode = `${b}${et}${s}`;
+    const btn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    spinner.style.display = 'block';
+
+    lastRef = genRef();
+    lastPayload = {
+      salle: roomCode,
+      batiment: b,
+      etage: et,
+      numerosalle: s,
+      categorie: cat,
+      typeProbleme: type,
+      description: document.getElementById('description').value,
+      declarant: document.getElementById('declarant').value || 'Anonyme',
+      date: new Date().toLocaleString('fr-FR'),
+      ref: lastRef
+    };
+
+    const payload = { ...lastPayload };
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(err) {
+      console.log('Envoi effectué (no-cors)');
+    }
+
+    btn.disabled = false;
+    btnText.style.display = 'block';
+    spinner.style.display = 'none';
+
+    document.getElementById('successRoom').textContent = roomCode;
+    document.getElementById('refNumber').textContent = `Réf. ${lastRef}`;
+    document.getElementById('successOverlay').classList.add('show');
+  });
+
+  // Génération PDF
+  document.getElementById('btnPdf').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const W = 210, margin = 20;
+
+    // Bandeau bleu en-tête
+    doc.setFillColor(30, 58, 138);
+    doc.rect(0, 0, W, 38, 'F');
+
+    // Titre établissement
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text(NOM_ETABLISSEMENT, W / 2, 15, { align: 'center' });
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('SERVICE TECHNIQUE — ATTESTATION DE SIGNALEMENT', W / 2, 24, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.text(`Réf. ${lastPayload.ref}`, W / 2, 32, { align: 'center' });
+
+    // Bandeau vert sous le header
+    doc.setFillColor(62, 207, 142);
+    doc.rect(0, 38, W, 2, 'F');
+
+    let y = 55;
+
+    // Titre attestation
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('ATTESTATION DE DÉCLARATION DE PROBLÈME', W / 2, y, { align: 'center' });
+    y += 6;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Déclaration enregistrée le ${lastPayload.date}`, W / 2, y, { align: 'center' });
+    y += 14;
+
+    // Fonction bloc info
+    const drawBlock = (label, value, color = [30, 58, 138]) => {
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(margin, y, W - margin * 2, 14, 3, 3, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(margin, y, W - margin * 2, 14, 3, 3, 'S');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...color);
+      doc.text(label.toUpperCase(), margin + 5, y + 5.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42);
+      doc.text(value || '—', margin + 5, y + 11.5);
+      y += 18;
+    };
+
+    // Séparateur section
+    const drawSection = (title) => {
+      doc.setFillColor(30, 58, 138);
+      doc.rect(margin, y, 3, 8, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(30, 58, 138);
+      doc.text(title, margin + 7, y + 6);
+      y += 13;
+    };
+
+    drawSection('IDENTIFICATION DE LA SALLE');
+    drawBlock('Code de la salle', lastPayload.salle, [30, 58, 138]);
+
+    // Grille bâtiment / étage côte à côte
+    const halfW = (W - margin * 2 - 5) / 2;
+    const drawHalf = (label, value, xOff) => {
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(margin + xOff, y, halfW, 14, 3, 3, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(margin + xOff, y, halfW, 14, 3, 3, 'S');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(30, 58, 138);
+      doc.text(label.toUpperCase(), margin + xOff + 5, y + 5.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42);
+      doc.text(value || '—', margin + xOff + 5, y + 11.5);
+    };
+    drawHalf('Bâtiment', `Bâtiment ${lastPayload.batiment}`, 0);
+    drawHalf('Étage', `${lastPayload.etage}e étage`, halfW + 5);
+    y += 18;
+
+    drawSection('NATURE DU PROBLÈME');
+    drawBlock('Catégorie', lastPayload.categorie, [99, 102, 241]);
+    drawBlock('Type de problème', lastPayload.typeProbleme, [239, 68, 68]);
+
+    if (lastPayload.description) {
+      // Bloc description multi-ligne
+      doc.setFillColor(254, 252, 232);
+      const descLines = doc.splitTextToSize(lastPayload.description, W - margin * 2 - 10);
+      const descH = Math.max(14, descLines.length * 6 + 8);
+      doc.roundedRect(margin, y, W - margin * 2, descH, 3, 3, 'F');
+      doc.setDrawColor(253, 224, 71);
+      doc.roundedRect(margin, y, W - margin * 2, descH, 3, 3, 'S');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(161, 98, 7);
+      doc.text('DESCRIPTION COMPLÉMENTAIRE', margin + 5, y + 5.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text(descLines, margin + 5, y + 11);
+      y += descH + 4;
+    }
+
+    y += 4;
+    drawSection('DÉCLARANT');
+    drawBlock('Nom du déclarant', lastPayload.declarant);
+
+    // Zone signature
+    y += 4;
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.line(margin, y, W - margin, y);
+    doc.setLineDashPattern([], 0);
+    y += 8;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(148, 163, 184);
+    doc.text('Signature du déclarant (facultatif) :', margin, y);
+    doc.line(margin + 70, y + 1, W - margin - 20, y + 1);
+    y += 16;
+
+    // Pied de page
+    doc.setFillColor(248, 250, 252);
+    doc.rect(0, 277, W, 20, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`Document généré automatiquement — ${lastPayload.date}`, margin, 285);
+    doc.text(`Réf. ${lastPayload.ref}`, W - margin, 285, { align: 'right' });
+
+    doc.save(`attestation-${lastPayload.salle}-${lastPayload.ref}.pdf`);
+  });
+
+  document.getElementById('btnNew').addEventListener('click', () => {
+    document.getElementById('successOverlay').classList.remove('show');
+    document.getElementById('reportForm').reset();
+    document.getElementById('roomCode').textContent = '—';
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('problemsWrap').classList.remove('visible');
+    document.getElementById('categorie').value = '';
+    document.getElementById('typeProbleme').value = '';
+  });
+</script>
+</body>
+</html>
