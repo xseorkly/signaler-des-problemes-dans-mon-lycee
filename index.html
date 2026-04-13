@@ -219,6 +219,16 @@ textarea{resize:vertical;min-height:90px;}
         <div class="setup-hint">URL de déploiement de votre Apps Script</div>
       </div>
       <div class="setup-field">
+        <label>ID de la feuille Google Sheets</label>
+        <input type="text" id="cfgSheetId" placeholder="Ex : 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+        <div class="setup-hint">Dans l'URL de votre Sheet : docs.google.com/spreadsheets/d/<strong>ID_ICI</strong>/edit</div>
+      </div>
+      <div class="setup-field">
+        <label>Nom de l'onglet Google Sheets</label>
+        <input type="text" id="cfgSheetName" placeholder="Signalements">
+        <div class="setup-hint">Nom exact de l'onglet dans votre feuille (laissez vide pour utiliser "Signalements")</div>
+      </div>
+      <div class="setup-field">
         <label>Email destinataire des alertes</label>
         <input type="email" id="cfgEmail" placeholder="technique@etablissement.fr">
         <div class="setup-hint">Recevra le signalement complet avec les photos en pièce jointe PDF</div>
@@ -263,7 +273,7 @@ textarea{resize:vertical;min-height:90px;}
       <div class="sub" id="headerSub"></div>
     </div>
     <div class="header-btns">
-      <button class="btn-header" onclick="openSettings()">⚙ Paramètres</button>
+      <button class="btn-header" onclick="openPasswordOverlay()">⚙ Paramètres</button>
     </div>
   </header>
   <div class="accent-bar"></div>
@@ -371,6 +381,24 @@ textarea{resize:vertical;min-height:90px;}
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════
+     OVERLAY MOT DE PASSE ADMIN
+══════════════════════════════════════ -->
+<div id="passwordOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(6,10,20,0.95);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;max-width:360px;width:100%;text-align:center;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);">
+    <div style="font-size:2.5rem;margin-bottom:12px;">🔐</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;">Accès administrateur</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">Entrez le mot de passe pour accéder aux paramètres</div>
+    <input type="password" id="adminPwdInput" placeholder="Mot de passe"
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 14px;outline:none;margin-bottom:10px;text-align:center;letter-spacing:0.1em;"
+      onkeydown="if(event.key==='Enter')checkAdminPassword()">
+    <div id="adminPwdError" style="color:var(--accent2);font-size:12px;margin-bottom:10px;display:none;">⚠️ Mot de passe incorrect</div>
+    <button onclick="checkAdminPassword()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#6366f1);border:none;border-radius:10px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">Accéder aux paramètres</button>
+    <button onclick="closePasswordOverlay()" style="width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Annuler</button>
+  </div>
+</div>
+
 <canvas id="hiddenCanvas" style="display:none"></canvas>
 
 <script>
@@ -388,7 +416,7 @@ const DEFAULT_BUILDINGS = [{name:'A',floors:4},{name:'B',floors:4},{name:'C',flo
 
 let CFG = {
   name:'',city:'',logoUrl:'',logoData:'',color:'#4f8cff',
-  scriptUrl:'',email:'',
+  scriptUrl:'',email:'',sheetId:'',sheetName:'',
   buildings:DEFAULT_BUILDINGS,
   rooms:'01,02,03,04,05,06,07,08,09,10',
   categories:DEFAULT_CATEGORIES
@@ -414,6 +442,8 @@ function saveConfig(){
   if(!name){alert('Veuillez entrer le nom de l\'établissement.');return;}
   CFG.name=name; CFG.city=document.getElementById('cfgCity').value.trim();
   CFG.scriptUrl=document.getElementById('cfgScriptUrl').value.trim();
+  CFG.sheetId=document.getElementById('cfgSheetId').value.trim();
+  CFG.sheetName=document.getElementById('cfgSheetName').value.trim()||'Signalements';
   CFG.email=document.getElementById('cfgEmail').value.trim();
   CFG.color=document.getElementById('cfgColor').value;
   CFG.rooms=document.getElementById('cfgRooms').value.trim();
@@ -432,6 +462,8 @@ function openSettings(){
   document.getElementById('cfgName').value=CFG.name;
   document.getElementById('cfgCity').value=CFG.city;
   document.getElementById('cfgScriptUrl').value=CFG.scriptUrl;
+  document.getElementById('cfgSheetId').value=CFG.sheetId||'';
+  document.getElementById('cfgSheetName').value=CFG.sheetName||'';
   document.getElementById('cfgEmail').value=CFG.email;
   document.getElementById('cfgColor').value=CFG.color;
   document.getElementById('cfgRooms').value=CFG.rooms;
@@ -799,7 +831,7 @@ async function submitForm(){
     description:document.getElementById('description').value,
     declarant:document.getElementById('declarant').value||'Anonyme',
     date:new Date().toLocaleString('fr-FR'),
-    ref:lastRef,emailAlert:CFG.email,etablissement:CFG.name,
+    ref:lastRef,emailAlert:CFG.email,etablissement:CFG.name,sheetId:CFG.sheetId,sheetName:CFG.sheetName||'Signalements',
     photoCount:capturedPhotos.length
   };
 
@@ -896,6 +928,41 @@ if(loadConfig()&&CFG.name){
   renderBuildingList();
   document.getElementById('setupScreen').style.display='flex';
 }
+
+// ══════════════════════════════════════════════
+// PROTECTION MOT DE PASSE ADMIN
+// ══════════════════════════════════════════════
+const ADMIN_PASSWORD = "FehmiEF2D";
+
+function openPasswordOverlay() {
+  const overlay = document.getElementById('passwordOverlay');
+  overlay.style.display = 'flex';
+  document.getElementById('adminPwdInput').value = '';
+  document.getElementById('adminPwdError').style.display = 'none';
+  setTimeout(() => document.getElementById('adminPwdInput').focus(), 100);
+}
+
+function closePasswordOverlay() {
+  document.getElementById('passwordOverlay').style.display = 'none';
+}
+
+function checkAdminPassword() {
+  const input = document.getElementById('adminPwdInput').value;
+  if (input === ADMIN_PASSWORD) {
+    closePasswordOverlay();
+    openSettings();
+  } else {
+    document.getElementById('adminPwdError').style.display = 'block';
+    document.getElementById('adminPwdInput').value = '';
+    document.getElementById('adminPwdInput').focus();
+    // Shake animation
+    const inp = document.getElementById('adminPwdInput');
+    inp.style.borderColor = 'var(--accent2)';
+    inp.style.boxShadow = '0 0 0 3px rgba(255,107,74,0.2)';
+    setTimeout(() => { inp.style.borderColor = ''; inp.style.boxShadow = ''; }, 1500);
+  }
+}
+
 </script>
 </body>
 </html>
