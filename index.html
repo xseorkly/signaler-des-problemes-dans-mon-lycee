@@ -259,6 +259,13 @@ textarea{resize:vertical;min-height:90px;}
     </div>
 
     <button class="btn-save-setup" onclick="saveConfig()">✓ &nbsp; Enregistrer et démarrer</button>
+
+    <div id="shareLinkBox" style="display:none;margin-top:14px;background:rgba(62,207,142,0.08);border:1px solid rgba(62,207,142,0.25);border-radius:12px;padding:16px 18px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px;">🔗 Lien de partage</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6;">Partagez ce lien avec les professeurs. Il contient toute la configuration — l'application sera prête sur n'importe quel appareil.</div>
+      <div id="shareLinkText" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:monospace;font-size:10px;color:var(--accent);word-break:break-all;margin-bottom:10px;max-height:60px;overflow:hidden;"></div>
+      <button onclick="copyShareLink()" style="width:100%;padding:10px;background:var(--green);border:none;border-radius:8px;color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📋 Copier le lien</button>
+    </div>
   </div>
 </div>
 
@@ -273,6 +280,7 @@ textarea{resize:vertical;min-height:90px;}
       <div class="sub" id="headerSub"></div>
     </div>
     <div class="header-btns">
+      <button class="btn-header" id="btnShareLink" onclick="copyShareLink()" title="Copier le lien de partage">🔗 Lien</button>
       <button class="btn-header" onclick="openPasswordOverlay()">⚙ Paramètres</button>
     </div>
   </header>
@@ -433,7 +441,31 @@ let facingMode     = 'environment';
 // ══════════════════════════════════════════════
 // CONFIG LOAD / SAVE
 // ══════════════════════════════════════════════
+// ── Encode / Decode config dans l'URL ──
+function cfgToUrl(cfg){
+  // On exclut logoData (trop long) de l'URL — on garde logoUrl
+  const c={...cfg}; delete c.logoData;
+  try{ return btoa(unescape(encodeURIComponent(JSON.stringify(c)))); }catch(e){return '';}
+}
+function urlToCfg(str){
+  try{ return JSON.parse(decodeURIComponent(escape(atob(str)))); }catch(e){return null;}
+}
+function getShareUrl(){
+  const base = window.location.href.split('?')[0].split('#')[0];
+  return base + '?cfg=' + cfgToUrl(CFG);
+}
+
 function loadConfig(){
+  // 1. Priorité : paramètre ?cfg= dans l'URL
+  try{
+    const params = new URLSearchParams(window.location.search);
+    const cfgParam = params.get('cfg');
+    if(cfgParam){
+      const parsed = urlToCfg(cfgParam);
+      if(parsed && parsed.name){ CFG={...CFG,...parsed}; localStorage.setItem('signalement_cfg_v2',JSON.stringify(CFG)); return true; }
+    }
+  }catch(e){}
+  // 2. Fallback : localStorage
   try{ const s=localStorage.getItem('signalement_cfg_v2'); if(s){CFG={...CFG,...JSON.parse(s)};return true;} }catch(e){}
   return false;
 }
@@ -456,9 +488,18 @@ function saveConfig(){
     if(n) CFG.buildings.push({name:n,floors:f});
   });
   localStorage.setItem('signalement_cfg_v2',JSON.stringify(CFG));
+  // Mettre à jour l'URL sans recharger la page
+  const newUrl = getShareUrl();
+  window.history.replaceState({}, '', newUrl);
   initApp();
 }
 function openSettings(){
+  // Afficher le lien de partage si config déjà sauvegardée
+  if(CFG.name){
+    const box=document.getElementById('shareLinkBox');
+    const txt=document.getElementById('shareLinkText');
+    if(box&&txt){ box.style.display='block'; txt.textContent=getShareUrl(); }
+  }
   document.getElementById('cfgName').value=CFG.name;
   document.getElementById('cfgCity').value=CFG.city;
   document.getElementById('cfgScriptUrl').value=CFG.scriptUrl;
@@ -914,19 +955,60 @@ document.getElementById('btnNew').addEventListener('click',()=>{
 // ══════════════════════════════════════════════
 // DÉMARRAGE
 // ══════════════════════════════════════════════
-if(loadConfig()&&CFG.name){
+// ── Configuration par défaut intégrée ──
+const HARDCODED_CFG = {
+  name: 'Lycée Pierre Loti',
+  city: 'Istanbul · Turquie',
+  logoUrl: 'https://raw.githubusercontent.com/xseorkly/photoeleve/refs/heads/main/logo.jpeg',
+  logoData: '',
+  color: '#4f8cff',
+  scriptUrl: 'https://script.google.com/macros/s/AKfycby2cb4S57wi4tbBJ4SP_IlBWWf6tg_9RDfgh3BaPgYhp3qes3UA0cl30VUOTMRSGTOn/exec',
+  sheetId: '1AKJzyrK_KF_Ieop5oOwzLHeqcMcvpkl56zufAYVC32c',
+  sheetName: 'Signalements',
+  email: 'fehmi.klabi@pierreloti.k12.tr',
+  buildings: [
+    {name:'A',floors:4},{name:'B',floors:4},{name:'C',floors:4},{name:'D',floors:4},
+    {name:'E',floors:4},{name:'F',floors:4},{name:'G',floors:4},{name:'H',floors:4},
+    {name:'I',floors:4},{name:'J',floors:4}
+  ],
+  rooms: '01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25',
+  categories: DEFAULT_CATEGORIES
+};
+
+// Charger : priorité URL > localStorage > config intégrée
+if(loadConfig() && CFG.name){
   initApp();
-}else{
-  document.getElementById('cfgName').value='Lycée Français Pierre Loti';
-  document.getElementById('cfgCity').value='Istanbul · Turquie';
-  document.getElementById('cfgLogoUrl').value='https://raw.githubusercontent.com/xseorkly/photoeleve/refs/heads/main/logo.jpeg';
-  document.getElementById('cfgCategories').value=DEFAULT_CATEGORIES;
-  document.getElementById('cfgRooms').value='01,02,03,04,05,06,07,08,09,10';
-  const p=document.getElementById('setupLogoPreview');
-  p.src='https://raw.githubusercontent.com/xseorkly/photoeleve/refs/heads/main/logo.jpeg';
-  p.style.display='block';
-  renderBuildingList();
-  document.getElementById('setupScreen').style.display='flex';
+} else {
+  // Appliquer la config intégrée
+  CFG = {...CFG, ...HARDCODED_CFG};
+  localStorage.setItem('signalement_cfg_v2', JSON.stringify(CFG));
+  initApp();
+}
+
+
+// ══════════════════════════════════════════════
+// PARTAGE DU LIEN DE CONFIGURATION
+// ══════════════════════════════════════════════
+function copyShareLink(){
+  const url = getShareUrl();
+  // Afficher dans la box
+  const box = document.getElementById('shareLinkBox');
+  const txt = document.getElementById('shareLinkText');
+  if(box && txt){ box.style.display='block'; txt.textContent=url; }
+  // Copier dans le presse-papier
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>{
+      const btn = document.getElementById('btnShareLink');
+      if(btn){ const orig=btn.textContent; btn.textContent='✅ Copié !'; btn.style.color='var(--green)'; setTimeout(()=>{btn.textContent=orig;btn.style.color='';},2500); }
+    });
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    const btn = document.getElementById('btnShareLink');
+    if(btn){ const orig=btn.textContent; btn.textContent='✅ Copié !'; setTimeout(()=>{btn.textContent=orig;},2500); }
+  }
 }
 
 // ══════════════════════════════════════════════
