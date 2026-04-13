@@ -63,6 +63,103 @@ body::before{content:'';position:fixed;inset:0;
 .btn-save-setup{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),#6366f1);border:none;border-radius:var(--radius);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.05em;cursor:pointer;transition:opacity 0.2s,transform 0.15s;margin-top:8px;}
 .btn-save-setup:hover{opacity:0.9;transform:translateY(-1px);}
 
+
+
+/* ══ CGU OVERLAY ══ */
+#cguOverlay{display:none;position:fixed;inset:0;z-index:99997;background:rgba(6,10,20,0.92);backdrop-filter:blur(6px);overflow-y:auto;padding:30px 16px 60px;align-items:flex-start;justify-content:center;}
+#cguOverlay.open{display:flex;}
+.cgu-wrap{width:100%;max-width:680px;}
+.cgu-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:16px;}
+.cgu-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.cgu-card p{font-size:13px;color:rgba(232,234,240,0.75);line-height:1.9;margin-bottom:10px;}
+.cgu-card p:last-child{margin-bottom:0;}
+.cgu-card strong{color:#fff;}
+.cgu-card ul{padding-left:0;list-style:none;margin:8px 0;}
+.cgu-card ul li{font-size:13px;color:rgba(232,234,240,0.75);line-height:1.8;padding-left:18px;position:relative;}
+.cgu-card ul li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700;}
+.cgu-header{text-align:center;margin-bottom:28px;position:relative;}
+.cgu-header h2{font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,30px);font-weight:800;color:#fff;margin-bottom:6px;}
+.cgu-header p{color:var(--muted);font-size:13px;}
+.cgu-badge{display:inline-block;background:rgba(79,140,255,0.12);border:1px solid rgba(79,140,255,0.25);border-radius:100px;color:var(--accent);font-size:11px;padding:4px 14px;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px;}
+.cgu-footer-btns{display:flex;gap:10px;justify-content:center;margin-top:20px;}
+.btn-cgu{padding:12px 28px;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:opacity 0.2s;}
+.btn-cgu-accept{background:linear-gradient(135deg,var(--accent),#6366f1);color:#fff;}
+.btn-cgu-close{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.btn-cgu-close:hover{border-color:var(--accent);color:var(--accent);}
+
+/* CGU footer link */
+.cgu-footer-link{text-align:center;margin-top:16px;padding-bottom:8px;}
+.cgu-footer-link button{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;}
+.cgu-footer-link button:hover{color:var(--accent);}
+
+/* ══ TUTORIAL OVERLAY ══ */
+#tutorialOverlay{display:none;position:fixed;inset:0;z-index:99998;background:rgba(6,10,20,0.92);backdrop-filter:blur(6px);overflow-y:auto;padding:30px 16px 60px;}
+#tutorialOverlay.open{display:block;}
+.tuto-wrap{max-width:700px;margin:0 auto;}
+.tuto-header{text-align:center;margin-bottom:32px;position:relative;}
+.tuto-header h2{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,34px);font-weight:800;color:#fff;margin-bottom:8px;}
+.tuto-header p{color:var(--muted);font-size:14px;line-height:1.6;}
+.btn-close-tuto{position:absolute;top:0;right:0;width:36px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
+.btn-close-tuto:hover{background:rgba(255,107,74,0.4);}
+
+.tuto-step{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden;}
+.tuto-step::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent);}
+.tuto-step.green::before{background:var(--green);}
+.tuto-step.orange::before{background:#f59e0b;}
+.tuto-step.purple::before{background:#a78bfa;}
+.tuto-step.red::before{background:var(--accent2);}
+
+.tuto-step-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.tuto-num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tuto-step.green .tuto-num{background:var(--green);}
+.tuto-step.orange .tuto-num{background:#f59e0b;}
+.tuto-step.purple .tuto-num{background:#a78bfa);}
+.tuto-step.red .tuto-num{background:var(--accent2);}
+.tuto-step-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;}
+.tuto-step-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+.tuto-text{font-size:13px;color:rgba(232,234,240,0.8);line-height:1.8;margin-bottom:12px;}
+.tuto-text strong{color:#fff;}
+.tuto-text code{background:rgba(79,140,255,0.15);color:var(--accent);border-radius:4px;padding:2px 7px;font-family:monospace;font-size:12px;}
+
+/* Illustration simulant une UI */
+.tuto-screen{background:#0a0d14;border:1px solid var(--border);border-radius:10px;padding:14px;margin:14px 0;font-family:monospace;font-size:12px;position:relative;overflow:hidden;}
+.tuto-screen::before{content:'● ● ●';position:absolute;top:8px;left:12px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:4px;}
+.tuto-screen-inner{margin-top:18px;}
+.tuto-url{background:rgba(255,255,255,0.06);border-radius:6px;padding:6px 10px;color:rgba(232,234,240,0.5);font-size:11px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.tuto-url .highlight{color:var(--accent);font-weight:700;background:rgba(79,140,255,0.2);border-radius:3px;padding:0 4px;}
+.tuto-ui-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.tuto-ui-label{font-size:10px;color:var(--muted);width:90px;flex-shrink:0;}
+.tuto-ui-box{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:11px;color:rgba(232,234,240,0.7);flex:1;}
+.tuto-ui-btn{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:10px;cursor:default;}
+.tuto-ui-btn.green{background:var(--green);}
+.tuto-arrow{text-align:center;font-size:20px;color:var(--muted);margin:4px 0;}
+.tuto-highlight-box{background:rgba(79,140,255,0.1);border:1px solid rgba(79,140,255,0.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12px;color:var(--accent);line-height:1.7;}
+.tuto-highlight-box.green{background:rgba(62,207,142,0.08);border-color:rgba(62,207,142,0.25);color:var(--green);}
+.tuto-highlight-box.orange{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);color:#f59e0b;}
+.tuto-highlight-box.red{background:rgba(255,107,74,0.08);border-color:rgba(255,107,74,0.25);color:var(--accent2);}
+.tuto-checklist{list-style:none;padding:0;margin:10px 0;}
+.tuto-checklist li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(232,234,240,0.8);margin-bottom:8px;line-height:1.5;}
+.tuto-checklist li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px;}
+.tuto-tag{display:inline-block;background:rgba(167,139,250,0.15);color:#a78bfa;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:0 2px;}
+.tuto-nav{display:flex;gap:10px;justify-content:center;margin-top:24px;}
+.btn-tuto-nav{padding:12px 28px;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:opacity 0.2s;}
+.btn-tuto-start{background:linear-gradient(135deg,var(--accent),#6366f1);color:#fff;}
+.btn-tuto-close{background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.btn-tuto-close:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ══ APP WELCOME BANNER ══ */
+.welcome-banner{position:relative;z-index:1;background:linear-gradient(135deg,rgba(79,140,255,0.12),rgba(99,102,241,0.08));border-bottom:1px solid rgba(79,140,255,0.2);padding:18px 20px;}
+.welcome-inner{max-width:640px;margin:0 auto;display:flex;align-items:flex-start;gap:14px;}
+.welcome-icon{font-size:2rem;flex-shrink:0;margin-top:2px;}
+.welcome-content h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;}
+.welcome-content p{font-size:12px;color:var(--muted);line-height:1.7;}
+.welcome-steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.welcome-step{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:4px 10px;font-size:11px;color:rgba(232,234,240,0.7);}
+.welcome-step .ws-num{width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.btn-close-welcome{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;opacity:0.6;}
+.btn-close-welcome:hover{opacity:1;}
+
 /* ══ APP ══ */
 #appScreen{display:none;flex-direction:column;min-height:100vh;}
 header{position:relative;z-index:1;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;}
@@ -101,6 +198,7 @@ textarea{resize:vertical;min-height:90px;}
 .prob-chip{background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:7px 14px;font-size:13px;cursor:pointer;transition:all 0.15s;color:var(--text);font-family:'DM Sans',sans-serif;white-space:nowrap;}
 .prob-chip:hover{border-color:var(--accent2);color:var(--accent2);}
 .prob-chip.active{background:rgba(255,107,74,0.15);border-color:var(--accent2);color:var(--accent2);}
+.prob-chip.active::before{content:'✓ ';font-weight:700;}
 
 /* ══ CAMERA ══ */
 .camera-section{}
@@ -174,6 +272,9 @@ textarea{resize:vertical;min-height:90px;}
       <div style="font-size:2.5rem">⚙️</div>
       <h2>Paramètres de l'application</h2>
       <p>Configurez une fois, utilisez partout</p>
+      <button onclick="openTutorial()" style="margin-top:14px;background:rgba(79,140,255,0.15);border:1px solid rgba(79,140,255,0.3);border-radius:100px;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 20px;cursor:pointer;transition:all 0.15s;">
+        📖 &nbsp; Voir le guide de configuration
+      </button>
     </div>
 
     <div class="setup-section">
@@ -286,6 +387,27 @@ textarea{resize:vertical;min-height:90px;}
   </header>
   <div class="accent-bar"></div>
 
+  <!-- Bandeau de bienvenue -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <button class="btn-close-welcome" onclick="document.getElementById('welcomeBanner').style.display='none'" title="Fermer">✕</button>
+    <div class="welcome-inner">
+      <div class="welcome-icon">🏫</div>
+      <div class="welcome-content">
+        <h3>Bienvenue sur l'application de signalement</h3>
+        <p>Signalez en quelques secondes tout problème technique ou matériel dans vos salles de classe. L'équipe de maintenance est automatiquement notifiée par email avec une attestation PDF.</p>
+        <div class="welcome-steps">
+          <div class="welcome-step"><div class="ws-num">1</div> Choisissez la salle</div>
+          <div class="welcome-step"><div class="ws-num">2</div> Sélectionnez le(s) problème(s)</div>
+          <div class="welcome-step"><div class="ws-num">3</div> Prenez des photos (optionnel)</div>
+          <div class="welcome-step"><div class="ws-num">4</div> Envoyez — c'est tout !</div>
+        </div>
+        <div style="margin-top:10px;">
+          <button onclick="openCGU()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;padding:0;">📄 Conditions d'utilisation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <main>
 
     <!-- Salle -->
@@ -313,13 +435,17 @@ textarea{resize:vertical;min-height:90px;}
 
     <!-- Catégorie -->
     <div class="card">
-      <div class="card-title">🔎 Catégorie du problème</div>
+      <div class="card-title">🔎 Catégories &amp; Problèmes <span style="font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">(sélection multiple possible)</span></div>
       <div class="cat-grid" id="catGrid"></div>
       <input type="hidden" id="categorie">
-      <div class="problems-wrap" id="problemsWrap">
-        <label style="margin-bottom:10px;display:block;margin-top:16px">Type de problème</label>
-        <div class="prob-list" id="probList"></div>
-        <input type="hidden" id="typeProbleme">
+      <!-- Zone problèmes par catégorie -->
+      <div id="allProblemsZone"></div>
+      <input type="hidden" id="typeProbleme">
+      <!-- Récapitulatif sélection globale -->
+      <div id="globalSelectionBox" style="display:none;margin-top:14px;background:rgba(255,107,74,0.08);border:1px solid rgba(255,107,74,0.25);border-radius:10px;padding:12px 14px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px;">✓ Problèmes sélectionnés</div>
+        <div id="globalSelectionList" style="font-size:13px;color:var(--text);line-height:1.8;"></div>
+        <button onclick="clearAllProblems()" style="margin-top:8px;background:none;border:1px solid rgba(255,107,74,0.3);border-radius:6px;color:var(--accent2);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;">✕ Tout effacer</button>
       </div>
     </div>
 
@@ -365,7 +491,7 @@ textarea{resize:vertical;min-height:90px;}
       </div>
     </div>
 
-    <div class="error-msg" id="errorMsg">⚠️ Veuillez sélectionner une salle, une catégorie et un type de problème.</div>
+    <div class="error-msg" id="errorMsg">⚠️ Veuillez sélectionner une salle et au moins un problème.</div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitForm()">
       <span id="btnText">Envoyer le signalement</span>
@@ -389,6 +515,268 @@ textarea{resize:vertical;min-height:90px;}
   </div>
 </div>
 
+
+
+
+<!-- ══════════════════════════════════════
+     CONDITIONS D'UTILISATION
+══════════════════════════════════════ -->
+<div id="cguOverlay">
+  <div class="cgu-wrap">
+
+    <div class="cgu-header">
+      <div class="cgu-badge">Document officiel</div>
+      <h2>Conditions d'utilisation</h2>
+      <p>Application de signalement de problèmes — Lycée Pierre Loti, Istanbul</p>
+    </div>
+
+    <div class="cgu-card">
+      <h3>📋 Présentation de l'application</h3>
+      <p>Cette application est un outil interne mis à disposition des personnels enseignants et non-enseignants du <strong>Lycée Pierre Loti (Istanbul, Turquie)</strong> pour signaler tout dysfonctionnement technique ou matériel constaté dans les locaux de l'établissement.</p>
+      <p>Elle est développée et administrée par l'équipe de direction de l'établissement. Son usage est strictement réservé aux membres de la communauté scolaire.</p>
+    </div>
+
+    <div class="cgu-card">
+      <h3>✅ Objet et usage autorisé</h3>
+      <p>L'application est destinée exclusivement à :</p>
+      <ul>
+        <li>Signaler des problèmes techniques (informatique, électricité, mobilier, matériel…)</li>
+        <li>Transmettre des informations à l'équipe de maintenance de l'établissement</li>
+        <li>Générer une attestation de déclaration pour archivage</li>
+        <li>Permettre un suivi centralisé des interventions via Google Sheets</li>
+      </ul>
+    </div>
+
+    <div class="cgu-card">
+      <h3>🔒 Données personnelles et confidentialité</h3>
+      <p>Les informations saisies dans le formulaire (nom du déclarant, salle, description du problème et photos) sont collectées dans le seul but de traiter les signalements.</p>
+      <ul>
+        <li>Le nom du déclarant est <strong>optionnel</strong> — vous pouvez rester anonyme</li>
+        <li>Les données sont stockées dans un Google Sheet accessible uniquement à l'administration</li>
+        <li>Les photos éventuellement jointes ne sont transmises qu'à l'équipe technique</li>
+        <li>Aucune donnée n'est transmise à des tiers ni utilisée à des fins commerciales</li>
+        <li>Les données peuvent être supprimées sur demande auprès de l'administration</li>
+      </ul>
+      <p>Conformément au <strong>Règlement Général sur la Protection des Données (RGPD)</strong>, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ces droits, contactez l'administration de l'établissement.</p>
+    </div>
+
+    <div class="cgu-card">
+      <h3>📷 Utilisation des photos</h3>
+      <p>La fonctionnalité de prise de photos est optionnelle. En utilisant cette fonctionnalité, vous acceptez que les images capturées :</p>
+      <ul>
+        <li>Soient utilisées uniquement pour illustrer et documenter le problème signalé</li>
+        <li>Soient transmises à l'équipe technique par email et stockées dans Google Sheets</li>
+        <li>Ne contiennent pas de personnes identifiables — photographiez uniquement le matériel défectueux</li>
+      </ul>
+    </div>
+
+    <div class="cgu-card">
+      <h3>⚠️ Responsabilités et bon usage</h3>
+      <p>En utilisant cette application, l'utilisateur s'engage à :</p>
+      <ul>
+        <li>Signaler uniquement des problèmes réels et avérés dans les locaux de l'établissement</li>
+        <li>Fournir des informations exactes et précises pour faciliter l'intervention</li>
+        <li>Ne pas utiliser l'application à des fins personnelles ou détournées</li>
+        <li>Ne pas effectuer de signalements abusifs ou de mauvaise foi</li>
+        <li>Ne pas partager le lien de l'application en dehors du personnel de l'établissement</li>
+      </ul>
+      <p>L'établissement se réserve le droit de désactiver l'accès en cas d'utilisation abusive.</p>
+    </div>
+
+    <div class="cgu-card">
+      <h3>🛡️ Sécurité</h3>
+      <p>L'accès aux paramètres de configuration est protégé par un mot de passe administrateur. Les signalements transitent via <strong>Google Apps Script</strong> et sont stockés dans <strong>Google Sheets</strong>, hébergés sur les serveurs de Google (conformité RGPD applicable).</p>
+      <p>L'établissement décline toute responsabilité en cas de mauvaise utilisation de l'outil ou de signalement erroné.</p>
+    </div>
+
+    <div class="cgu-card">
+      <h3>📬 Contact</h3>
+      <p>Pour toute question relative à l'application ou aux données collectées, contactez :</p>
+      <p><strong>Administration du Lycée Pierre Loti</strong><br>
+      Istanbul, Turquie<br>
+      Email : <strong>fehmi.klabi@pierreloti.k12.tr</strong></p>
+      <p style="font-size:11px;opacity:0.5;margin-top:16px;">Version 1.0 — Lycée Pierre Loti — Istanbul · Turquie — 2025</p>
+    </div>
+
+    <div class="cgu-footer-btns">
+      <button class="btn-cgu btn-cgu-close" onclick="closeCGU()">Fermer</button>
+      <button class="btn-cgu btn-cgu-accept" onclick="closeCGU()">✓ J'ai lu et j'accepte</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TUTORIEL OVERLAY
+══════════════════════════════════════ -->
+<div id="tutorialOverlay">
+  <div class="tuto-wrap">
+
+    <div class="tuto-header">
+      <button class="btn-close-tuto" onclick="closeTutorial()">✕</button>
+      <div style="font-size:3rem;margin-bottom:12px;">📖</div>
+      <h2>Guide de configuration</h2>
+      <p>Pas de panique ! Suivez ces étapes dans l'ordre.<br>Chaque étape prend moins de 5 minutes.</p>
+    </div>
+
+    <!-- ÉTAPE 1 : Identité -->
+    <div class="tuto-step">
+      <div class="tuto-step-header">
+        <div class="tuto-num">1</div>
+        <div>
+          <div class="tuto-step-title">🏫 Nom, ville et logo de l'établissement</div>
+          <div class="tuto-step-sub">Les infos qui apparaîtront sur vos badges et PDF</div>
+        </div>
+      </div>
+      <p class="tuto-text">Ces informations sont <strong>purement visuelles</strong> — elles apparaîtront dans l'en-tête de l'application et sur chaque attestation PDF générée.</p>
+      <div class="tuto-screen">
+        <div class="tuto-screen-inner">
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Nom :</span><div class="tuto-ui-box">Lycée Pierre Loti</div></div>
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Ville :</span><div class="tuto-ui-box">Istanbul · Turquie</div></div>
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Logo URL :</span><div class="tuto-ui-box" style="color:var(--accent)">https://monsite.fr/logo.png</div></div>
+        </div>
+      </div>
+      <div class="tuto-highlight-box orange">💡 Pour le logo : faites un clic droit sur votre logo sur votre site web → "Copier l'adresse de l'image" → collez l'URL dans le champ. Ou utilisez l'onglet "📁 Fichier" pour uploader directement depuis votre ordinateur.</div>
+    </div>
+
+    <!-- ÉTAPE 2 : Google Sheet -->
+    <div class="tuto-step green">
+      <div class="tuto-step-header">
+        <div class="tuto-num" style="background:var(--green)">2</div>
+        <div>
+          <div class="tuto-step-title">📊 Créer et configurer Google Sheets</div>
+          <div class="tuto-step-sub">La feuille qui recevra tous vos signalements</div>
+        </div>
+      </div>
+      <p class="tuto-text"><strong>Étape 2a — Créer la feuille</strong></p>
+      <ul class="tuto-checklist">
+        <li>Allez sur <code>sheets.google.com</code> et connectez-vous avec votre compte Google</li>
+        <li>Cliquez sur <strong>"+ Vierge"</strong> pour créer une nouvelle feuille</li>
+        <li>Donnez-lui un nom, par exemple <strong>"Signalements Lycée"</strong></li>
+      </ul>
+      <p class="tuto-text"><strong>Étape 2b — Trouver l'ID de la feuille</strong></p>
+      <div class="tuto-screen">
+        <div class="tuto-screen-inner">
+          <div class="tuto-url">
+            <span style="opacity:0.4">docs.google.com/spreadsheets/d/</span>
+            <span class="highlight">1AKJzyrK_KF_Ieop5oOwzLHeq...</span>
+            <span style="opacity:0.4">/edit</span>
+          </div>
+          <div style="text-align:center;font-size:11px;color:var(--green);margin-top:4px;">⬆ Copiez cette partie de l'URL — c'est l'ID de votre feuille</div>
+        </div>
+      </div>
+      <div class="tuto-highlight-box green">✓ Copiez l'ID (la partie entre <code>/d/</code> et <code>/edit</code>) et collez-le dans le champ <strong>"ID de la feuille Google Sheets"</strong> des paramètres.</div>
+    </div>
+
+    <!-- ÉTAPE 3 : Apps Script -->
+    <div class="tuto-step orange">
+      <div class="tuto-step-header">
+        <div class="tuto-num" style="background:#f59e0b">3</div>
+        <div>
+          <div class="tuto-step-title">⚡ Créer le Google Apps Script</div>
+          <div class="tuto-step-sub">Le moteur qui envoie les données dans votre feuille et les emails</div>
+        </div>
+      </div>
+      <p class="tuto-text">C'est l'étape la plus technique, mais ne vous inquiétez pas — suivez exactement ces étapes :</p>
+      <ul class="tuto-checklist">
+        <li>Allez sur <code>script.google.com</code> avec votre compte Google</li>
+        <li>Cliquez <strong>"Nouveau projet"</strong> (bouton en haut à gauche)</li>
+        <li>Sélectionnez tout le texte dans l'éditeur avec <strong>Ctrl+A</strong> puis supprimez-le</li>
+        <li>Ouvrez le fichier <strong>google_apps_script.js</strong> avec le Bloc-notes, copiez tout (<strong>Ctrl+A</strong> puis <strong>Ctrl+C</strong>), et collez dans l'éditeur (<strong>Ctrl+V</strong>)</li>
+        <li>Avec <strong>Ctrl+H</strong>, remplacez <code>VOTRE_SHEET_ID_ICI</code> par l'ID copié à l'étape 2</li>
+        <li>Cliquez sur <strong>💾 Enregistrer</strong> (Ctrl+S) et donnez un nom au projet</li>
+      </ul>
+      <p class="tuto-text"><strong>Déploiement :</strong></p>
+      <div class="tuto-screen">
+        <div class="tuto-screen-inner">
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;">
+            <div class="tuto-ui-btn">⚙ Déployer ▼</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px 10px;font-size:11px;color:rgba(232,234,240,0.7);">
+            <div style="margin-bottom:6px;">✦ Nouveau déploiement</div>
+            <div style="opacity:0.5">  Gérer les déploiements</div>
+          </div>
+          <div class="tuto-arrow">↓</div>
+          <div style="font-size:11px;color:rgba(232,234,240,0.6);">Type → <strong style="color:#fff">Application Web</strong></div>
+          <div style="font-size:11px;color:rgba(232,234,240,0.6);margin-top:4px;">Exécuter en tant que → <strong style="color:#fff">Moi</strong></div>
+          <div style="font-size:11px;color:rgba(232,234,240,0.6);margin-top:4px;">Qui a accès → <strong style="color:var(--green)">Tout le monde</strong></div>
+        </div>
+      </div>
+      <ul class="tuto-checklist">
+        <li>Cliquez <strong>"Déployer"</strong> → <strong>"Nouveau déploiement"</strong></li>
+        <li>Type : <strong>Application Web</strong> — Accès : <strong>Tout le monde</strong></li>
+        <li>Cliquez <strong>"Déployer"</strong> et autorisez les permissions demandées par Google</li>
+        <li>Copiez l'URL générée (commence par <code>https://script.google.com/macros/s/...</code>)</li>
+      </ul>
+      <div class="tuto-highlight-box orange">⚠️ Si Google affiche "Application non vérifiée" → cliquez <strong>"Paramètres avancés"</strong> puis <strong>"Accéder au projet (non sécurisé)"</strong>. C'est normal pour un script personnel.</div>
+    </div>
+
+    <!-- ÉTAPE 4 : Email -->
+    <div class="tuto-step red">
+      <div class="tuto-step-header">
+        <div class="tuto-num" style="background:var(--accent2)">4</div>
+        <div>
+          <div class="tuto-step-title">📧 Configurer l'email d'alerte</div>
+          <div class="tuto-step-sub">Recevez un email à chaque nouveau signalement</div>
+        </div>
+      </div>
+      <p class="tuto-text">À chaque signalement envoyé, un email automatique sera envoyé à l'adresse de votre choix. Cet email contiendra <strong>toutes les informations du signalement</strong> ainsi que le <strong>PDF en pièce jointe</strong> (avec les photos si disponibles).</p>
+      <div class="tuto-screen">
+        <div class="tuto-screen-inner">
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Email :</span><div class="tuto-ui-box">responsable@lycee.fr</div></div>
+        </div>
+      </div>
+      <div class="tuto-highlight-box red">💡 Conseil : utilisez l'email du responsable technique ou de maintenance. Vous pouvez changer cette adresse à tout moment dans les paramètres.</div>
+    </div>
+
+    <!-- ÉTAPE 5 : Bâtiments -->
+    <div class="tuto-step" style="border-left:4px solid #a78bfa;">
+      <div class="tuto-step-header">
+        <div class="tuto-num" style="background:#a78bfa">5</div>
+        <div>
+          <div class="tuto-step-title">🏢 Configurer les bâtiments et salles</div>
+          <div class="tuto-step-sub">Adaptez la structure à votre établissement</div>
+        </div>
+      </div>
+      <p class="tuto-text">Configurez les bâtiments de votre établissement. Chaque bâtiment a un nom et un nombre d'étages. Les salles sont numérotées automatiquement.</p>
+      <div class="tuto-screen">
+        <div class="tuto-screen-inner">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:8px;">BÂTIMENTS</div>
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Nom :</span><div class="tuto-ui-box">A</div><span class="tuto-ui-label" style="width:60px">Étages :</span><div class="tuto-ui-box" style="max-width:40px">4</div></div>
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Nom :</span><div class="tuto-ui-box">B</div><span class="tuto-ui-label" style="width:60px">Étages :</span><div class="tuto-ui-box" style="max-width:40px">3</div></div>
+          <div style="font-size:10px;color:var(--muted);margin:10px 0 6px">NUMÉROS DE SALLES</div>
+          <div class="tuto-ui-row"><span class="tuto-ui-label">Salles :</span><div class="tuto-ui-box">01, 02, 03, 04, 05, 06...</div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px;">→ Code généré automatiquement : <strong style="color:var(--accent)">A204</strong> = Bâtiment A, 2e étage, salle 04</div>
+        </div>
+      </div>
+      <ul class="tuto-checklist">
+        <li>Cliquez <strong>"＋ Ajouter un bâtiment"</strong> pour chaque bâtiment de votre établissement</li>
+        <li>Entrez le nom (ex: A, B, C ou Principale, Annexe…) et le nombre d'étages</li>
+        <li>Dans "Numéros de salles", listez tous les numéros séparés par des virgules</li>
+      </ul>
+      <div class="tuto-highlight-box" style="background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.25);color:#a78bfa;">✨ Exemple : pour les salles 01 à 25 tapez : <code>01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25</code></div>
+    </div>
+
+    <!-- RÉSUMÉ FINAL -->
+    <div class="tuto-step green">
+      <div class="tuto-step-header">
+        <div class="tuto-num" style="background:var(--green)">✓</div>
+        <div>
+          <div class="tuto-step-title">🎉 Tout est configuré !</div>
+          <div class="tuto-step-sub">Voici comment partager l'application</div>
+        </div>
+      </div>
+      <p class="tuto-text">Une fois tous les paramètres renseignés et enregistrés, cliquez sur le bouton <strong>🔗 Lien</strong> dans le header de l'application. Copiez ce lien et partagez-le aux professeurs par email ou ENT.</p>
+      <div class="tuto-highlight-box green">✓ N'importe qui avec le lien accède directement au formulaire, déjà configuré, sur n'importe quel appareil — téléphone, tablette ou ordinateur.</div>
+    </div>
+
+    <div class="tuto-nav">
+      <button class="btn-tuto-nav btn-tuto-close" onclick="closeTutorial()">✕ Fermer le guide</button>
+      <button class="btn-tuto-nav btn-tuto-start" onclick="closeTutorial()">✓ C'est compris, je configure !</button>
+    </div>
+
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════
      OVERLAY MOT DE PASSE ADMIN
@@ -594,32 +982,109 @@ function parseCategories(){
   });
   return result;
 }
+// Stockage global : {catégorie: [prob1, prob2...]}
+let selectedProblems = {};
+
 function buildCategories(){
   const grid=document.getElementById('catGrid'); grid.innerHTML='';
+  const zone=document.getElementById('allProblemsZone'); zone.innerHTML='';
+  selectedProblems={};
   const cats=parseCategories();
   Object.keys(cats).forEach(cat=>{
-    const btn=document.createElement('button'); btn.type='button'; btn.className='cat-btn'; btn.dataset.cat=cat;
     const icon=CAT_ICONS[cat]||Object.entries(CAT_ICONS).find(([k])=>cat.toLowerCase().includes(k.toLowerCase()))?.[1]||'🔧';
+    // Bouton catégorie
+    const btn=document.createElement('button'); btn.type='button'; btn.className='cat-btn'; btn.dataset.cat=cat;
     btn.innerHTML=`<span class="cat-icon">${icon}</span><span class="cat-name">${cat}</span>`;
     btn.addEventListener('click',()=>{
-      document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('categorie').value=cat;
-      document.getElementById('typeProbleme').value='';
-      renderProblems(cats[cat]);
+      const isActive=btn.classList.contains('active');
+      btn.classList.toggle('active');
+      const z=document.getElementById('catzone_'+cat.replace(/[^a-zA-Z0-9]/g,'_'));
+      if(isActive){
+        if(z) z.style.display='none';
+        selectedProblems[cat]=[];
+        if(z) z.querySelectorAll('.prob-chip').forEach(c=>c.classList.remove('active'));
+        const badge=btn.querySelector('.cat-count'); if(badge) badge.remove();
+      } else {
+        if(z) z.style.display='block';
+      }
+      updateGlobalSelection();
     });
     grid.appendChild(btn);
+    // Zone de problèmes
+    const zoneDiv=document.createElement('div');
+    const safeId=cat.replace(/[^a-zA-Z0-9]/g,'_');
+    zoneDiv.id='catzone_'+safeId;
+    zoneDiv.style.cssText='display:none;margin-top:14px;padding:12px 0 4px;border-top:1px solid var(--border);';
+    const probListDiv=document.createElement('div');
+    probListDiv.className='prob-list';
+    probListDiv.id='problist_'+safeId;
+    const catLabel=document.createElement('div');
+    catLabel.style.cssText='font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;';
+    catLabel.textContent=icon+' '+cat;
+    zoneDiv.appendChild(catLabel);
+    zoneDiv.appendChild(probListDiv);
+    zone.appendChild(zoneDiv);
+    // Chips problèmes
+    cats[cat].forEach(p=>{
+      const chip=document.createElement('button'); chip.type='button'; chip.className='prob-chip'; chip.textContent=p;
+      chip.addEventListener('click',()=>{
+        chip.classList.toggle('active');
+        if(!selectedProblems[cat]) selectedProblems[cat]=[];
+        if(chip.classList.contains('active')){
+          if(!selectedProblems[cat].includes(p)) selectedProblems[cat].push(p);
+        } else {
+          selectedProblems[cat]=selectedProblems[cat].filter(x=>x!==p);
+        }
+        // Badge compteur sur le bouton catégorie
+        const oldBadge=btn.querySelector('.cat-count'); if(oldBadge) oldBadge.remove();
+        const cnt=(selectedProblems[cat]||[]).length;
+        if(cnt>0){
+          const badge=document.createElement('span'); badge.className='cat-count';
+          badge.style.cssText='display:inline-block;background:var(--accent2);color:#fff;border-radius:100px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:5px;';
+          badge.textContent=cnt; btn.querySelector('.cat-name').after(badge);
+        }
+        updateGlobalSelection();
+      });
+      probListDiv.appendChild(chip);
+    });
   });
 }
-function renderProblems(probs){
-  const wrap=document.getElementById('problemsWrap'),list=document.getElementById('probList');
-  list.innerHTML='';wrap.classList.add('visible');
-  probs.forEach(p=>{
-    const chip=document.createElement('button');chip.type='button';chip.className='prob-chip';chip.textContent=p;
-    chip.addEventListener('click',()=>{document.querySelectorAll('.prob-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');document.getElementById('typeProbleme').value=p;});
-    list.appendChild(chip);
+
+function updateGlobalSelection(){
+  const allSelected=[]; const allCats=[];
+  Object.entries(selectedProblems).forEach(([cat,probs])=>{
+    if(probs&&probs.length>0){ allSelected.push(...probs); allCats.push(cat); }
   });
+  document.getElementById('typeProbleme').value=allSelected.join(', ');
+  document.getElementById('categorie').value=allCats.join(', ');
+  const box=document.getElementById('globalSelectionBox');
+  const list=document.getElementById('globalSelectionList');
+  if(allSelected.length===0){ box.style.display='none'; list.innerHTML=''; return; }
+  box.style.display='block';
+  let html='';
+  Object.entries(selectedProblems).forEach(([cat,probs])=>{
+    if(probs&&probs.length>0){
+      const icon=CAT_ICONS[cat]||'🔧';
+      html+=`<div style="margin-bottom:4px;"><span style="opacity:0.6;font-size:12px;">${icon} ${cat} :</span> <strong>${probs.join(', ')}</strong></div>`;
+    }
+  });
+  list.innerHTML=html;
 }
+
+function clearAllProblems(){
+  selectedProblems={};
+  document.getElementById('typeProbleme').value='';
+  document.getElementById('categorie').value='';
+  document.querySelectorAll('.prob-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.cat-btn').forEach(b=>{
+    b.classList.remove('active');
+    const badge=b.querySelector('.cat-count'); if(badge) badge.remove();
+    const safeId=b.dataset.cat.replace(/[^a-zA-Z0-9]/g,'_');
+    const z=document.getElementById('catzone_'+safeId); if(z) z.style.display='none';
+  });
+  document.getElementById('globalSelectionBox').style.display='none';
+}
+
 
 // ══════════════════════════════════════════════
 // CAMERA
@@ -757,7 +1222,16 @@ function buildPDF(){
 
   section('NATURE DU PROBLÈME');
   block('Catégorie',lastPayload.categorie,245,243,255);
-  block('Type de problème',lastPayload.typeProbleme,255,245,245);
+  // Type de problème — peut être multiple, on gère le wrapping
+  const probVal = lastPayload.typeProbleme || '—';
+  const probLines = doc.splitTextToSize(probVal, W-M*2-10);
+  const probH = Math.max(14, probLines.length * 5.5 + 8);
+  doc.setFillColor(255,245,245); doc.roundedRect(M,y,W-M*2,probH,3,3,'F');
+  doc.setDrawColor(226,232,240); doc.roundedRect(M,y,W-M*2,probH,3,3,'S');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(cr,cg,cb);
+  doc.text('TYPE(S) DE PROBLÈME',M+5,y+5.5);
+  doc.setFont('helvetica','normal'); doc.setFontSize(probLines.length>1?9:11); doc.setTextColor(15,23,42);
+  doc.text(probLines,M+5,y+11); y+=probH+4;
 
   if(lastPayload.description&&lastPayload.description.trim()){
     const lines=doc.splitTextToSize(lastPayload.description,W-M*2-10);
@@ -857,7 +1331,7 @@ async function submitForm(){
         s=document.getElementById('selSalle').value,
         cat=document.getElementById('categorie').value,
         typ=document.getElementById('typeProbleme').value;
-  if(!b||!e||!s||!cat||!typ){document.getElementById('errorMsg').classList.add('show');return;}
+  if(!b||!e||!s||!typ){document.getElementById('errorMsg').classList.add('show');return;}
 
   const btn=document.getElementById('submitBtn'),btnText=document.getElementById('btnText'),spinner=document.getElementById('spinner');
   btn.disabled=true; btnText.style.display='none'; spinner.style.display='block';
@@ -934,11 +1408,7 @@ function resetForm(){
   document.getElementById('selEtage').innerHTML='<option value="">—</option>';
   document.getElementById('selSalle').value='';
   document.getElementById('roomCode').textContent='—';
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.prob-chip').forEach(c=>c.classList.remove('active'));
-  document.getElementById('problemsWrap').classList.remove('visible');
-  document.getElementById('categorie').value='';
-  document.getElementById('typeProbleme').value='';
+  clearAllProblems();
   document.getElementById('description').value='';
   document.getElementById('declarant').value='';
   // Reset photos
@@ -1010,6 +1480,43 @@ function copyShareLink(){
     if(btn){ const orig=btn.textContent; btn.textContent='✅ Copié !'; setTimeout(()=>{btn.textContent=orig;},2500); }
   }
 }
+
+
+
+// ══════════════════════════════════════════════
+// CONDITIONS D'UTILISATION
+// ══════════════════════════════════════════════
+function openCGU(){
+  document.getElementById('cguOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('cguOverlay').scrollTop=0;
+}
+function closeCGU(){
+  document.getElementById('cguOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ══════════════════════════════════════════════
+// TUTORIEL
+// ══════════════════════════════════════════════
+function openTutorial(){
+  document.getElementById('tutorialOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  // Scroll to top of tutorial
+  document.getElementById('tutorialOverlay').scrollTop=0;
+}
+function closeTutorial(){
+  document.getElementById('tutorialOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+// Fermer tutoriel avec Escape
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){
+    closeTutorial();
+    closeCGU();
+    closePasswordOverlay();
+  }
+});
 
 // ══════════════════════════════════════════════
 // PROTECTION MOT DE PASSE ADMIN
