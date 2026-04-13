@@ -7,446 +7,268 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #181c27;
-    --surface2: #1e2333;
-    --border: #2a2f42;
-    --accent: #4f8cff;
-    --accent2: #ff6b4a;
-    --green: #3ecf8e;
-    --text: #e8eaf0;
-    --muted: #6b7290;
-    --radius: 14px;
-  }
+:root{
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2333;--border:#2a2f42;
+  --accent:#4f8cff;--accent2:#ff6b4a;--green:#3ecf8e;
+  --text:#e8eaf0;--muted:#6b7290;--radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(79,140,255,0.04) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(79,140,255,0.04) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ══ SETUP ══ */
+#setupScreen{position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#060a14 0%,#0f1117 60%,#060a14 100%);
+  display:flex;align-items:flex-start;justify-content:center;padding:30px 16px 60px;overflow-y:auto;}
+.setup-wrap{width:100%;max-width:640px;}
+.setup-logo-area{text-align:center;margin-bottom:28px;}
+.setup-logo-area h2{font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,30px);font-weight:800;color:#fff;margin-top:10px;}
+.setup-logo-area p{font-size:13px;color:var(--muted);margin-top:6px;}
+.setup-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;}
+.setup-section-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.setup-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.setup-field{margin-bottom:14px;}.setup-field:last-child{margin-bottom:0;}
+.setup-field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;}
+.setup-field input[type=text],.setup-field input[type=url],.setup-field input[type=email],.setup-field textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;}
+.setup-field input:focus,.setup-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,0.15);}
+.setup-field input::placeholder,.setup-field textarea::placeholder{color:rgba(107,114,144,0.55);}
+.setup-field textarea{resize:vertical;min-height:120px;font-size:12.5px;line-height:1.7;}
+.setup-hint{font-size:11px;color:var(--muted);margin-top:5px;opacity:0.75;line-height:1.5;}
+.logo-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.logo-tab{padding:5px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.logo-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.logo-upload-zone{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;background:var(--surface2);transition:border-color 0.2s;}
+.logo-upload-zone:hover{border-color:var(--accent);}
+.logo-upload-zone p{font-size:12px;color:var(--muted);}
+#setupLogoPreview{max-height:56px;max-width:160px;object-fit:contain;display:none;margin:10px auto 0;border-radius:4px;}
+.color-row{display:flex;gap:8px;align-items:center;}
+.color-row input[type=color]{width:40px;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;background:var(--surface2);}
+.color-row span{font-size:12px;color:var(--muted);}
+.building-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.building-row{display:grid;grid-template-columns:1fr 90px auto;gap:8px;align-items:end;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.b-field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;}
+.b-field input{width:100%;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;outline:none;transition:border-color 0.2s;}
+.b-field input:focus{border-color:var(--accent);}
+.btn-rm-b{background:rgba(255,107,74,0.15);border:none;color:var(--accent2);width:32px;height:32px;border-radius:7px;cursor:pointer;font-size:14px;transition:background 0.15s;}
+.btn-rm-b:hover{background:rgba(255,107,74,0.3);}
+.btn-add-b{background:transparent;border:1px dashed var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;padding:9px;cursor:pointer;width:100%;transition:border-color 0.2s,color 0.2s;}
+.btn-add-b:hover{border-color:var(--accent);color:var(--accent);}
+.btn-save-setup{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),#6366f1);border:none;border-radius:var(--radius);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.05em;cursor:pointer;transition:opacity 0.2s,transform 0.15s;margin-top:8px;}
+.btn-save-setup:hover{opacity:0.9;transform:translateY(-1px);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 16px 80px;
-  }
+/* ══ APP ══ */
+#appScreen{display:none;flex-direction:column;min-height:100vh;}
+header{position:relative;z-index:1;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;}
+#headerLogo{height:40px;object-fit:contain;border-radius:4px;display:none;}
+.header-titles{flex:1;}
+.header-titles h1{font-family:'Syne',sans-serif;font-size:clamp(16px,3vw,22px);font-weight:800;color:#fff;}
+.header-titles .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.header-btns{display:flex;gap:8px;}
+.btn-header{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 12px;cursor:pointer;transition:all 0.15s;}
+.btn-header:hover{border-color:var(--accent);color:var(--accent);}
+.accent-bar{height:3px;background:linear-gradient(90deg,var(--accent),#6366f1,var(--green));position:relative;z-index:1;}
+main{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:32px 16px 80px;width:100%;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;}
+.card-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.field-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.field-group:last-child{margin-bottom:0;}
+label{font-size:12px;font-weight:500;color:var(--muted);}
+select,input[type="text"],textarea{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 14px;width:100%;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;-webkit-appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7290' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+select:focus,input[type="text"]:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,0.15);}
+option{background:#1e2333;}
+textarea{resize:vertical;min-height:90px;}
+.room-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.room-preview{margin-top:14px;background:rgba(79,140,255,0.08);border:1px solid rgba(79,140,255,0.2);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.room-preview-label{font-size:12px;color:var(--muted);}
+.room-preview-code{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--accent);}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;}
+.cat-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:left;transition:all 0.18s;color:var(--text);font-family:'DM Sans',sans-serif;}
+.cat-btn:hover{border-color:var(--accent);background:rgba(79,140,255,0.06);}
+.cat-btn.active{border-color:var(--accent);background:rgba(79,140,255,0.12);box-shadow:0 0 0 3px rgba(79,140,255,0.12);}
+.cat-icon{font-size:22px;display:block;margin-bottom:6px;}
+.cat-name{font-size:13px;font-weight:500;}
+.problems-wrap{display:none;}.problems-wrap.visible{display:block;}
+.prob-list{display:flex;flex-wrap:wrap;gap:8px;}
+.prob-chip{background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:7px 14px;font-size:13px;cursor:pointer;transition:all 0.15s;color:var(--text);font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.prob-chip:hover{border-color:var(--accent2);color:var(--accent2);}
+.prob-chip.active{background:rgba(255,107,74,0.15);border-color:var(--accent2);color:var(--accent2);}
 
-  /* Background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(79,140,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(79,140,255,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ══ CAMERA ══ */
+.camera-section{}
+.camera-frame{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:10px;overflow:hidden;cursor:pointer;}
+.camera-frame::before,.camera-frame::after{content:'';position:absolute;width:20px;height:20px;border-color:var(--accent);border-style:solid;z-index:10;}
+.camera-frame::before{top:8px;left:8px;border-width:2px 0 0 2px;}
+.camera-frame::after{bottom:8px;right:8px;border-width:0 2px 2px 0;}
+.cam-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(232,234,240,0.35);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;}
+.cam-placeholder svg{width:48px;height:48px;opacity:0.25;}
+#videoEl{width:100%;height:100%;object-fit:cover;display:none;}
+.flash-overlay{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;z-index:20;transition:opacity 0.05s;}
+.flash-overlay.active{opacity:1;}
+#btnSwitchCam{display:none;position:absolute;top:10px;right:10px;z-index:15;background:rgba(0,0,0,0.55);border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;color:white;font-size:1.2rem;align-items:center;justify-content:center;}
 
-  .container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 620px;
-  }
+.cam-controls{display:flex;gap:8px;margin-top:10px;align-items:center;}
+.btn-start-cam{flex:1;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.2s;}
+.btn-start-cam:hover{opacity:0.85;}
+.btn-capture{flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.2s;display:none;}
+.btn-capture:hover{opacity:0.85;}
+.btn-capture:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-stop-cam{padding:12px 14px;background:rgba(255,107,74,0.15);color:var(--accent2);border:1px solid rgba(255,107,74,0.3);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:background 0.2s;display:none;}
+.btn-stop-cam:hover{background:rgba(255,107,74,0.25);}
 
-  header {
-    margin-bottom: 36px;
-    text-align: center;
-  }
+.photos-counter{font-size:12px;color:var(--muted);text-align:right;margin-top:8px;}
+.photos-counter span{color:var(--accent);font-weight:600;}
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(79,140,255,0.12);
-    border: 1px solid rgba(79,140,255,0.25);
-    border-radius: 100px;
-    padding: 5px 14px;
-    font-size: 12px;
-    color: var(--accent);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-bottom: 18px;
-  }
+.photos-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;}
+.photo-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);animation:fadeIn 0.25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-thumb .btn-del-photo{position:absolute;top:3px;right:3px;width:20px;height:20px;background:rgba(192,57,43,0.88);color:white;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.photo-thumb .photo-num{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;padding:1px 5px;border-radius:4px;font-weight:600;}
+.no-photos{text-align:center;padding:20px;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:10px;margin-top:10px;}
 
-  .badge::before { content: '●'; font-size: 8px; animation: blink 2s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* ══ SUBMIT ══ */
+.submit-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),#6366f1);border:none;border-radius:var(--radius);color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;letter-spacing:0.04em;cursor:pointer;transition:opacity 0.2s,transform 0.15s;margin-top:8px;}
+.submit-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-msg{color:var(--accent2);font-size:13px;margin-top:8px;display:none;}
+.error-msg.show{display:block;}
 
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(26px, 5vw, 38px);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    color: #fff;
-  }
+/* ══ SUCCESS OVERLAY ══ */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,0.88);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px;}
+.success-overlay.show{display:flex;}
+.success-card{background:var(--surface);border:1px solid var(--green);border-radius:20px;padding:36px 28px;text-align:center;max-width:400px;width:100%;animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.success-icon{width:60px;height:60px;background:rgba(62,207,142,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;}
+.success-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:8px;}
+.success-msg{color:var(--muted);font-size:13px;line-height:1.6;}
+.success-room{display:inline-block;background:rgba(62,207,142,0.12);border:1px solid rgba(62,207,142,0.3);color:var(--green);font-family:'Syne',sans-serif;font-weight:700;font-size:18px;border-radius:8px;padding:4px 14px;margin:8px 0;}
+.ref-number{font-family:monospace;font-size:11px;color:var(--muted);margin-top:4px;}
+.btn-pdf{margin-top:14px;background:linear-gradient(135deg,var(--green),#2bb57a);border:none;border-radius:10px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:12px 20px;cursor:pointer;width:100%;transition:opacity 0.2s,transform 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-pdf:hover{opacity:0.9;transform:translateY(-1px);}
+.btn-new{margin-top:10px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 20px;cursor:pointer;transition:border-color 0.2s;width:100%;}
+.btn-new:hover{border-color:var(--accent);color:var(--accent);}
+.success-photos-info{font-size:11px;color:var(--green);margin-top:6px;opacity:0.8;}
 
-  h1 span {
-    background: linear-gradient(135deg, var(--accent), #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .subtitle {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: 15px;
-    line-height: 1.5;
-  }
-
-  /* Card */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 32px;
-    margin-bottom: 16px;
-  }
-
-  .card-title {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .card-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Room selector */
-  .room-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-  }
-
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.03em;
-  }
-
-  select, input[type="text"], textarea {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    padding: 12px 14px;
-    width: 100%;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
-  select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7290' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-    cursor: pointer;
-  }
-
-  select:focus, input[type="text"]:focus, textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(79,140,255,0.15);
-  }
-
-  option { background: #1e2333; }
-
-  /* Room preview pill */
-  .room-preview {
-    margin-top: 16px;
-    background: rgba(79,140,255,0.08);
-    border: 1px solid rgba(79,140,255,0.2);
-    border-radius: 10px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .room-preview-label { font-size: 13px; color: var(--muted); }
-
-  .room-preview-code {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-  }
-
-  /* Categories */
-  .cat-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .cat-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 12px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.18s;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .cat-btn:hover {
-    border-color: var(--accent);
-    background: rgba(79,140,255,0.06);
-  }
-
-  .cat-btn.active {
-    border-color: var(--accent);
-    background: rgba(79,140,255,0.12);
-    box-shadow: 0 0 0 3px rgba(79,140,255,0.12);
-  }
-
-  .cat-icon { font-size: 22px; display: block; margin-bottom: 6px; }
-  .cat-name { font-size: 13px; font-weight: 500; }
-
-  /* Problem types */
-  .problems-wrap { display: none; }
-  .problems-wrap.visible { display: block; }
-
-  .prob-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .prob-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 7px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
-  }
-
-  .prob-chip:hover { border-color: var(--accent2); color: var(--accent2); }
-  .prob-chip.active {
-    background: rgba(255,107,74,0.15);
-    border-color: var(--accent2);
-    color: var(--accent2);
-  }
-
-  textarea {
-    resize: vertical;
-    min-height: 90px;
-  }
-
-  /* Submit */
-  .submit-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--accent), #6366f1);
-    border: none;
-    border-radius: var(--radius);
-    color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.15s;
-    margin-top: 8px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .submit-btn:active { transform: translateY(0); }
-  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* Spinner */
-  .spinner {
-    display: none;
-    width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Success overlay */
-  .success-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(10,12,20,0.85);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(6px);
-  }
-
-  .success-overlay.show { display: flex; }
-
-  .success-card {
-    background: var(--surface);
-    border: 1px solid var(--green);
-    border-radius: 20px;
-    padding: 48px 40px;
-    text-align: center;
-    max-width: 380px;
-    width: 90%;
-    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  @keyframes popIn {
-    from { transform: scale(0.85); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  .success-icon {
-    width: 64px; height: 64px;
-    background: rgba(62,207,142,0.12);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 30px;
-  }
-
-  .success-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 10px;
-  }
-
-  .success-msg { color: var(--muted); font-size: 14px; line-height: 1.6; }
-
-  .success-room {
-    display: inline-block;
-    background: rgba(62,207,142,0.12);
-    border: 1px solid rgba(62,207,142,0.3);
-    color: var(--green);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    border-radius: 8px;
-    padding: 4px 14px;
-    margin: 10px 0;
-  }
-
-  .btn-new {
-    margin-top: 24px;
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    padding: 10px 24px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-
-  .btn-new:hover { border-color: var(--accent); color: var(--accent); }
-
-  .btn-pdf {
-    margin-top: 12px;
-    background: linear-gradient(135deg, var(--green), #2bb57a);
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 12px 24px;
-    cursor: pointer;
-    width: 100%;
-    transition: opacity 0.2s, transform 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-pdf:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-pdf:active { transform: translateY(0); }
-
-  .ref-number {
-    font-family: monospace;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 8px;
-    letter-spacing: 0.05em;
-  }
-
-  /* Error */
-  .error-msg {
-    color: var(--accent2);
-    font-size: 13px;
-    margin-top: 8px;
-    display: none;
-  }
-
-  .error-msg.show { display: block; }
-
-  footer {
-    margin-top: 32px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    opacity: 0.6;
-  }
-
-  @media (max-width: 480px) {
-    .card { padding: 20px 16px; }
-    .room-grid { grid-template-columns: 1fr 1fr; }
-    .cat-grid { grid-template-columns: 1fr 1fr; }
-  }
+@media(max-width:480px){.room-grid{grid-template-columns:1fr 1fr;}.cat-grid{grid-template-columns:1fr 1fr;}.photos-grid{grid-template-columns:repeat(3,1fr);}}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <div class="badge">Établissement scolaire</div>
-    <h1>Signalement<br><span>d'un problème en salle</span></h1>
-    <p class="subtitle">Signalez rapidement un dysfonctionnement.<br>Les informations sont transmises à l'équipe technique.</p>
-  </header>
+<!-- ══════════════════════════════════════
+     ÉCRAN PARAMÈTRES
+══════════════════════════════════════ -->
+<div id="setupScreen">
+  <div class="setup-wrap">
+    <div class="setup-logo-area">
+      <div style="font-size:2.5rem">⚙️</div>
+      <h2>Paramètres de l'application</h2>
+      <p>Configurez une fois, utilisez partout</p>
+    </div>
 
-  <form id="reportForm">
+    <div class="setup-section">
+      <div class="setup-section-title">🏫 Identité de l'établissement</div>
+      <div class="setup-field">
+        <label>Nom de l'établissement *</label>
+        <input type="text" id="cfgName" placeholder="Ex : Lycée Français Pierre Loti">
+      </div>
+      <div class="setup-field">
+        <label>Ville · Pays</label>
+        <input type="text" id="cfgCity" placeholder="Ex : Istanbul · Turquie">
+      </div>
+      <div class="setup-field">
+        <label>Logo</label>
+        <div class="logo-tabs">
+          <button class="logo-tab active" id="tabUrl" onclick="switchLogoTab('url')">🔗 URL</button>
+          <button class="logo-tab" id="tabUpload" onclick="switchLogoTab('upload')">📁 Fichier</button>
+        </div>
+        <div id="logoUrlPanel"><input type="url" id="cfgLogoUrl" placeholder="https://... (.png, .jpg)"></div>
+        <div id="logoUploadPanel" style="display:none">
+          <div class="logo-upload-zone" onclick="document.getElementById('logoFileInput').click()">
+            <p>🖼 Cliquez pour choisir le logo</p>
+            <p style="font-size:11px;margin-top:4px;opacity:0.6">JPG, PNG, WEBP</p>
+          </div>
+          <input type="file" id="logoFileInput" accept="image/*" style="display:none">
+        </div>
+        <img id="setupLogoPreview" alt="Aperçu">
+      </div>
+      <div class="setup-field">
+        <label>Couleur principale</label>
+        <div class="color-row">
+          <input type="color" id="cfgColor" value="#4f8cff">
+          <span>Couleur de l'interface et du PDF</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-section-title">📊 Google Sheets &amp; Alertes email</div>
+      <div class="setup-field">
+        <label>URL du Google Apps Script (déployé)</label>
+        <input type="url" id="cfgScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+        <div class="setup-hint">URL de déploiement de votre Apps Script</div>
+      </div>
+      <div class="setup-field">
+        <label>Email destinataire des alertes</label>
+        <input type="email" id="cfgEmail" placeholder="technique@etablissement.fr">
+        <div class="setup-hint">Recevra le signalement complet avec les photos en pièce jointe PDF</div>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-section-title">🏢 Structure des bâtiments</div>
+      <div class="setup-field">
+        <label>Bâtiments</label>
+        <div class="building-list" id="buildingList"></div>
+        <button class="btn-add-b" onclick="addBuilding()">＋ Ajouter un bâtiment</button>
+      </div>
+      <div class="setup-field">
+        <label>Numéros de salles disponibles</label>
+        <input type="text" id="cfgRooms" placeholder="01, 02, 03, 04, 05, 06, 07, 08, 09, 10">
+        <div class="setup-hint">Séparez par des virgules</div>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <div class="setup-section-title">🔧 Catégories de problèmes</div>
+      <div class="setup-field">
+        <label>Catégories et types de problèmes</label>
+        <textarea id="cfgCategories"></textarea>
+        <div class="setup-hint">Format : <strong>Catégorie: problème1, problème2</strong> — une catégorie par ligne</div>
+      </div>
+    </div>
+
+    <button class="btn-save-setup" onclick="saveConfig()">✓ &nbsp; Enregistrer et démarrer</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APPLICATION PRINCIPALE
+══════════════════════════════════════ -->
+<div id="appScreen">
+  <header>
+    <img id="headerLogo" alt="Logo">
+    <div class="header-titles">
+      <h1 id="headerName">Signalement</h1>
+      <div class="sub" id="headerSub"></div>
+    </div>
+    <div class="header-btns">
+      <button class="btn-header" onclick="openSettings()">⚙ Paramètres</button>
+    </div>
+  </header>
+  <div class="accent-bar"></div>
+
+  <main>
 
     <!-- Salle -->
     <div class="card">
@@ -454,31 +276,15 @@
       <div class="room-grid">
         <div class="field-group">
           <label>Bâtiment</label>
-          <select id="batiment" required>
-            <option value="">—</option>
-            <option>A</option><option>B</option><option>C</option><option>D</option>
-          </select>
+          <select id="selBatiment"></select>
         </div>
         <div class="field-group">
           <label>Étage</label>
-          <select id="etage" required>
-            <option value="">—</option>
-            <option value="1">1er étage</option>
-            <option value="2">2e étage</option>
-            <option value="3">3e étage</option>
-            <option value="4">4e étage</option>
-          </select>
+          <select id="selEtage"><option value="">—</option></select>
         </div>
         <div class="field-group">
-          <label>Numéro de salle</label>
-          <select id="salle" required>
-            <option value="">—</option>
-            <option value="01">01</option><option value="02">02</option>
-            <option value="03">03</option><option value="04">04</option>
-            <option value="05">05</option><option value="06">06</option>
-            <option value="07">07</option><option value="08">08</option>
-            <option value="09">09</option><option value="10">10</option>
-          </select>
+          <label>Salle</label>
+          <select id="selSalle"><option value="">—</option></select>
         </div>
       </div>
       <div class="room-preview">
@@ -490,44 +296,50 @@
     <!-- Catégorie -->
     <div class="card">
       <div class="card-title">🔎 Catégorie du problème</div>
-      <div class="cat-grid">
-        <button type="button" class="cat-btn" data-cat="Informatique">
-          <span class="cat-icon">🖥️</span>
-          <span class="cat-name">Informatique</span>
-        </button>
-        <button type="button" class="cat-btn" data-cat="Mobilier">
-          <span class="cat-icon">🪑</span>
-          <span class="cat-name">Mobilier</span>
-        </button>
-        <button type="button" class="cat-btn" data-cat="Électricité / Éclairage">
-          <span class="cat-icon">💡</span>
-          <span class="cat-name">Électricité / Lumière</span>
-        </button>
-        <button type="button" class="cat-btn" data-cat="Matériel divers">
-          <span class="cat-icon">🔧</span>
-          <span class="cat-name">Matériel divers</span>
-        </button>
-        <button type="button" class="cat-btn" data-cat="Autre">
-          <span class="cat-icon">📋</span>
-          <span class="cat-name">Autre</span>
-        </button>
-      </div>
+      <div class="cat-grid" id="catGrid"></div>
       <input type="hidden" id="categorie">
-
-      <!-- Types de problèmes dynamiques -->
       <div class="problems-wrap" id="problemsWrap">
-        <label style="margin-bottom:10px;display:block;margin-top:18px;">Type de problème</label>
+        <label style="margin-bottom:10px;display:block;margin-top:16px">Type de problème</label>
         <div class="prob-list" id="probList"></div>
         <input type="hidden" id="typeProbleme">
       </div>
     </div>
 
-    <!-- Description + Déclarant -->
+    <!-- Photos -->
+    <div class="card">
+      <div class="card-title">📷 Photos du problème <span style="font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">(optionnel — max 5)</span></div>
+
+      <div class="camera-frame" id="cameraFrame">
+        <div class="cam-placeholder" id="camPlaceholder">
+          <svg fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          Appuyez sur "Activer la caméra" pour prendre des photos
+        </div>
+        <video id="videoEl" autoplay playsinline muted></video>
+        <div class="flash-overlay" id="flashOverlay"></div>
+        <button id="btnSwitchCam" title="Retourner caméra">⟳</button>
+      </div>
+
+      <div class="cam-controls">
+        <button class="btn-start-cam" id="btnStartCam" onclick="startCamera()">📷 Activer la caméra</button>
+        <button class="btn-capture" id="btnCapture" onclick="capturePhoto()">⊙ Prendre une photo</button>
+        <button class="btn-stop-cam" id="btnStopCam" onclick="stopCamera()">✕ Arrêter</button>
+      </div>
+
+      <div class="photos-counter">Photos : <span id="photoCount">0</span> / 5</div>
+
+      <div id="photosGrid" class="photos-grid"></div>
+      <div class="no-photos" id="noPhotos">Aucune photo — la caméra est optionnelle</div>
+    </div>
+
+    <!-- Détails -->
     <div class="card">
       <div class="card-title">📝 Détails</div>
-      <div class="field-group" style="margin-bottom:16px;">
+      <div class="field-group" style="margin-bottom:14px">
         <label>Description complémentaire <span style="opacity:0.5">(optionnel)</span></label>
-        <textarea id="description" placeholder="Décrivez le problème plus précisément si nécessaire…"></textarea>
+        <textarea id="description" placeholder="Précisez le problème si nécessaire…"></textarea>
       </div>
       <div class="field-group">
         <label>Votre nom <span style="opacity:0.5">(optionnel)</span></label>
@@ -535,332 +347,555 @@
       </div>
     </div>
 
-    <div class="error-msg" id="errorMsg">⚠️ Veuillez remplir tous les champs obligatoires (salle, catégorie et type de problème).</div>
+    <div class="error-msg" id="errorMsg">⚠️ Veuillez sélectionner une salle, une catégorie et un type de problème.</div>
 
-    <button type="submit" class="submit-btn" id="submitBtn">
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">
       <span id="btnText">Envoyer le signalement</span>
       <div class="spinner" id="spinner"></div>
     </button>
-  </form>
-
-  <footer>Formulaire interne — Les données sont enregistrées dans Google Sheets</footer>
+  </main>
 </div>
 
-<!-- Overlay succès -->
+<!-- Success overlay -->
 <div class="success-overlay" id="successOverlay">
   <div class="success-card">
     <div class="success-icon">✅</div>
     <div class="success-title">Signalement envoyé !</div>
     <div class="success-msg">Le problème de la salle</div>
     <div class="success-room" id="successRoom">—</div>
-    <div class="success-msg">a bien été transmis à l'équipe technique. Merci !</div>
+    <div class="success-msg">a été transmis à l'équipe technique.</div>
     <div class="ref-number" id="refNumber">Réf. —</div>
+    <div class="success-photos-info" id="successPhotosInfo"></div>
     <button class="btn-pdf" id="btnPdf">📄 Télécharger l'attestation PDF</button>
     <button class="btn-new" id="btnNew">Faire un autre signalement</button>
   </div>
 </div>
 
+<canvas id="hiddenCanvas" style="display:none"></canvas>
+
 <script>
-  // ⚠️ REMPLACEZ par l'URL de votre Google Apps Script déployé
-  const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_ICI/exec";
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const DEFAULT_CATEGORIES =
+`Informatique: Ordinateur en panne, Réseau / Wi-Fi, Vidéoprojecteur, Écran défectueux, Clavier / Souris, Logiciel, Imprimante
+Mobilier: Table cassée, Chaise cassée, Bureau professeur, Armoire abîmée, Fenêtre, Stores, Tableau blanc
+Électricité: Lumière défectueuse, Prise électrique cassée, Disjoncteur, Interrupteur hors service
+Matériel: Serrure / Porte, Climatisation / Chauffage, Plomberie, Nettoyage urgent
+Autre: À préciser dans la description`;
 
-  // ⚠️ NOM DE VOTRE ÉTABLISSEMENT
-  const NOM_ETABLISSEMENT = "Établissement Scolaire";
+const DEFAULT_BUILDINGS = [{name:'A',floors:4},{name:'B',floors:4},{name:'C',floors:4},{name:'D',floors:4}];
 
-  // Stockage global du dernier signalement pour le PDF
-  let lastPayload = {};
-  let lastRef = "";
+let CFG = {
+  name:'',city:'',logoUrl:'',logoData:'',color:'#4f8cff',
+  scriptUrl:'',email:'',
+  buildings:DEFAULT_BUILDINGS,
+  rooms:'01,02,03,04,05,06,07,08,09,10',
+  categories:DEFAULT_CATEGORIES
+};
 
-  function genRef() {
-    const now = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    return `SIG-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${Math.floor(Math.random()*9000+1000)}`;
+let lastPayload={}, lastRef='', lastPdfBlob=null;
+let logoTabMode='url', setupLogoData='';
+
+// ── Photos state ──
+let capturedPhotos = []; // array of base64 dataURLs
+let cameraStream   = null;
+let facingMode     = 'environment';
+
+// ══════════════════════════════════════════════
+// CONFIG LOAD / SAVE
+// ══════════════════════════════════════════════
+function loadConfig(){
+  try{ const s=localStorage.getItem('signalement_cfg_v2'); if(s){CFG={...CFG,...JSON.parse(s)};return true;} }catch(e){}
+  return false;
+}
+function saveConfig(){
+  const name=document.getElementById('cfgName').value.trim();
+  if(!name){alert('Veuillez entrer le nom de l\'établissement.');return;}
+  CFG.name=name; CFG.city=document.getElementById('cfgCity').value.trim();
+  CFG.scriptUrl=document.getElementById('cfgScriptUrl').value.trim();
+  CFG.email=document.getElementById('cfgEmail').value.trim();
+  CFG.color=document.getElementById('cfgColor').value;
+  CFG.rooms=document.getElementById('cfgRooms').value.trim();
+  CFG.categories=document.getElementById('cfgCategories').value.trim();
+  if(logoTabMode==='url'){CFG.logoUrl=document.getElementById('cfgLogoUrl').value.trim();CFG.logoData='';}
+  else{CFG.logoData=setupLogoData||'';CFG.logoUrl='';}
+  CFG.buildings=[];
+  document.querySelectorAll('.building-row').forEach(row=>{
+    const n=row.querySelector('.b-name').value.trim(), f=parseInt(row.querySelector('.b-floors').value)||1;
+    if(n) CFG.buildings.push({name:n,floors:f});
+  });
+  localStorage.setItem('signalement_cfg_v2',JSON.stringify(CFG));
+  initApp();
+}
+function openSettings(){
+  document.getElementById('cfgName').value=CFG.name;
+  document.getElementById('cfgCity').value=CFG.city;
+  document.getElementById('cfgScriptUrl').value=CFG.scriptUrl;
+  document.getElementById('cfgEmail').value=CFG.email;
+  document.getElementById('cfgColor').value=CFG.color;
+  document.getElementById('cfgRooms').value=CFG.rooms;
+  document.getElementById('cfgCategories').value=CFG.categories;
+  if(CFG.logoUrl) document.getElementById('cfgLogoUrl').value=CFG.logoUrl;
+  const src=CFG.logoData||CFG.logoUrl;
+  if(src){const p=document.getElementById('setupLogoPreview');p.src=src;p.style.display='block';}
+  renderBuildingList();
+  document.getElementById('setupScreen').style.display='flex';
+  document.getElementById('appScreen').style.display='none';
+}
+function switchLogoTab(mode){
+  logoTabMode=mode;
+  document.getElementById('tabUrl').classList.toggle('active',mode==='url');
+  document.getElementById('tabUpload').classList.toggle('active',mode==='upload');
+  document.getElementById('logoUrlPanel').style.display=mode==='url'?'block':'none';
+  document.getElementById('logoUploadPanel').style.display=mode==='upload'?'block':'none';
+}
+document.getElementById('cfgLogoUrl').addEventListener('input',function(){
+  const p=document.getElementById('setupLogoPreview');p.src=this.value;p.style.display=this.value?'block':'none';
+});
+document.getElementById('logoFileInput').addEventListener('change',function(){
+  const file=this.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{setupLogoData=e.target.result;const p=document.getElementById('setupLogoPreview');p.src=setupLogoData;p.style.display='block';};
+  reader.readAsDataURL(file);
+});
+function renderBuildingList(){
+  const list=document.getElementById('buildingList'); list.innerHTML='';
+  const data=(CFG.buildings&&CFG.buildings.length)?CFG.buildings:DEFAULT_BUILDINGS;
+  data.forEach(b=>list.appendChild(makeBuildingRow(b.name,b.floors)));
+}
+function makeBuildingRow(name,floors){
+  const div=document.createElement('div'); div.className='building-row';
+  div.innerHTML=`<div class="b-field"><label>Nom du bâtiment</label><input class="b-name" type="text" value="${name}" placeholder="Ex : A"></div>
+    <div class="b-field"><label>Étages</label><input class="b-floors" type="number" min="1" max="20" value="${floors}"></div>
+    <button class="btn-rm-b" onclick="this.closest('.building-row').remove()" title="Supprimer">✕</button>`;
+  return div;
+}
+function addBuilding(){ document.getElementById('buildingList').appendChild(makeBuildingRow('',4)); }
+
+// ══════════════════════════════════════════════
+// INIT APP
+// ══════════════════════════════════════════════
+function initApp(){
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('appScreen').style.display='flex';
+  document.documentElement.style.setProperty('--accent',CFG.color||'#4f8cff');
+  document.getElementById('headerName').textContent=CFG.name||'Signalement';
+  document.getElementById('headerSub').textContent=CFG.city||'Signalement de problèmes en salle';
+  const src=CFG.logoData||CFG.logoUrl;
+  const hLogo=document.getElementById('headerLogo');
+  if(src){hLogo.src=src;hLogo.style.display='block';}else hLogo.style.display='none';
+  buildSelectors(); buildCategories(); resetForm();
+}
+
+// ── Selectors ──
+function buildSelectors(){
+  const selBat=document.getElementById('selBatiment'), selEt=document.getElementById('selEtage'), selSalle=document.getElementById('selSalle');
+  selBat.innerHTML='<option value="">—</option>';
+  (CFG.buildings||[]).forEach(b=>{const o=document.createElement('option');o.value=b.name;o.textContent=`Bâtiment ${b.name}`;selBat.appendChild(o);});
+  selBat.addEventListener('change',()=>{
+    const b=(CFG.buildings||[]).find(x=>x.name===selBat.value);
+    selEt.innerHTML='<option value="">—</option>';
+    if(b) for(let i=1;i<=b.floors;i++){const o=document.createElement('option');o.value=i;o.textContent=`${i}${i===1?'er':'e'} étage`;selEt.appendChild(o);}
+    updateRoomCode();
+  });
+  const roomNums=(CFG.rooms||'01,02,03,04,05,06,07,08,09,10').split(',').map(r=>r.trim()).filter(Boolean);
+  selSalle.innerHTML='<option value="">—</option>';
+  roomNums.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;selSalle.appendChild(o);});
+  [selBat,selEt,selSalle].forEach(s=>s.addEventListener('change',updateRoomCode));
+}
+function updateRoomCode(){
+  const b=document.getElementById('selBatiment').value,e=document.getElementById('selEtage').value,s=document.getElementById('selSalle').value;
+  document.getElementById('roomCode').textContent=(b&&e&&s)?`${b}${e}${s}`:'—';
+}
+
+// ── Categories ──
+const CAT_ICONS={'Informatique':'🖥️','Mobilier':'🪑','Électricité':'💡','Matériel':'🔧','Autre':'📋'};
+function parseCategories(){
+  const result={};
+  (CFG.categories||'').split('\n').forEach(line=>{
+    const idx=line.indexOf(':');if(idx===-1)return;
+    const cat=line.substring(0,idx).trim();
+    const probs=line.substring(idx+1).split(',').map(p=>p.trim()).filter(Boolean);
+    if(cat&&probs.length) result[cat]=probs;
+  });
+  return result;
+}
+function buildCategories(){
+  const grid=document.getElementById('catGrid'); grid.innerHTML='';
+  const cats=parseCategories();
+  Object.keys(cats).forEach(cat=>{
+    const btn=document.createElement('button'); btn.type='button'; btn.className='cat-btn'; btn.dataset.cat=cat;
+    const icon=CAT_ICONS[cat]||Object.entries(CAT_ICONS).find(([k])=>cat.toLowerCase().includes(k.toLowerCase()))?.[1]||'🔧';
+    btn.innerHTML=`<span class="cat-icon">${icon}</span><span class="cat-name">${cat}</span>`;
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('categorie').value=cat;
+      document.getElementById('typeProbleme').value='';
+      renderProblems(cats[cat]);
+    });
+    grid.appendChild(btn);
+  });
+}
+function renderProblems(probs){
+  const wrap=document.getElementById('problemsWrap'),list=document.getElementById('probList');
+  list.innerHTML='';wrap.classList.add('visible');
+  probs.forEach(p=>{
+    const chip=document.createElement('button');chip.type='button';chip.className='prob-chip';chip.textContent=p;
+    chip.addEventListener('click',()=>{document.querySelectorAll('.prob-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');document.getElementById('typeProbleme').value=p;});
+    list.appendChild(chip);
+  });
+}
+
+// ══════════════════════════════════════════════
+// CAMERA
+// ══════════════════════════════════════════════
+async function startCamera(){
+  if(capturedPhotos.length>=5){alert('Maximum 5 photos atteint.');return;}
+  try{
+    if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());}
+    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode,width:{ideal:1280},height:{ideal:960}},audio:false});
+    const video=document.getElementById('videoEl');
+    video.srcObject=cameraStream;
+    video.style.display='block';
+    document.getElementById('camPlaceholder').style.display='none';
+    document.getElementById('btnStartCam').style.display='none';
+    document.getElementById('btnCapture').style.display='flex';
+    document.getElementById('btnStopCam').style.display='block';
+    document.getElementById('btnCapture').disabled=false;
+    // Switch cam button
+    const sw=document.getElementById('btnSwitchCam');
+    sw.style.display='flex';
+    sw.onclick=async()=>{facingMode=facingMode==='environment'?'user':'environment';await startCamera();};
+  }catch(err){
+    alert('Caméra inaccessible : '+err.message+'\n\nVérifiez les permissions de votre navigateur.');
   }
+}
 
-  const problems = {
-    "Informatique": [
-      "Ordinateur en panne","Ordinateur lent","Réseau / Wi-Fi","Vidéoprojecteur",
-      "Écran défectueux","Clavier / Souris","Logiciel","Imprimante","Autre informatique"
-    ],
-    "Mobilier": [
-      "Table cassée","Chaise cassée","Bureau professeur","Armoire abîmée",
-      "Porte endommagée","Fenêtre","Stores","Tableau blanc","Autre mobilier"
-    ],
-    "Électricité / Éclairage": [
-      "Lumière défectueuse","Prise électrique cassée","Disjoncteur",
-      "Interrupteur hors service","Câblage apparent","Autre électricité"
-    ],
-    "Matériel divers": [
-      "Serrure / Porte","Climatisation / Chauffage","Plomberie",
-      "Nettoyage urgent","Affichage mural","Autre matériel"
-    ],
-    "Autre": ["À préciser dans la description"]
+function stopCamera(){
+  if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+  const video=document.getElementById('videoEl');
+  video.style.display='none'; video.srcObject=null;
+  document.getElementById('camPlaceholder').style.display='flex';
+  document.getElementById('btnStartCam').style.display='block';
+  document.getElementById('btnCapture').style.display='none';
+  document.getElementById('btnStopCam').style.display='none';
+  document.getElementById('btnSwitchCam').style.display='none';
+}
+
+function capturePhoto(){
+  if(capturedPhotos.length>=5){alert('Maximum 5 photos atteint.');return;}
+  const video=document.getElementById('videoEl');
+  const canvas=document.getElementById('hiddenCanvas');
+  canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480;
+  const ctx=canvas.getContext('2d');
+  // Mirror si caméra frontale
+  if(facingMode==='user'){ctx.translate(canvas.width,0);ctx.scale(-1,1);}
+  ctx.drawImage(video,0,0);
+  ctx.setTransform(1,0,0,1,0,0);
+  // Flash
+  const flash=document.getElementById('flashOverlay');
+  flash.classList.add('active');
+  setTimeout(()=>flash.classList.remove('active'),120);
+  const dataUrl=canvas.toDataURL('image/jpeg',0.82);
+  capturedPhotos.push(dataUrl);
+  renderPhotoGrid();
+  // Auto-stop si 5 photos
+  if(capturedPhotos.length>=5){stopCamera();}
+}
+
+function renderPhotoGrid(){
+  const grid=document.getElementById('photosGrid');
+  const noPhotos=document.getElementById('noPhotos');
+  document.getElementById('photoCount').textContent=capturedPhotos.length;
+  grid.innerHTML='';
+  if(capturedPhotos.length===0){noPhotos.style.display='block';return;}
+  noPhotos.style.display='none';
+  capturedPhotos.forEach((dataUrl,i)=>{
+    const div=document.createElement('div'); div.className='photo-thumb';
+    div.innerHTML=`<img src="${dataUrl}" alt="Photo ${i+1}"><button class="btn-del-photo" onclick="deletePhoto(${i})" title="Supprimer">✕</button><span class="photo-num">${i+1}</span>`;
+    grid.appendChild(div);
+  });
+  // Re-enable capture if stopped at 5
+  if(capturedPhotos.length<5 && !cameraStream){
+    document.getElementById('btnStartCam').style.display='block';
+  }
+}
+
+function deletePhoto(idx){
+  capturedPhotos.splice(idx,1);
+  renderPhotoGrid();
+}
+
+// ══════════════════════════════════════════════
+// PDF GENERATION
+// ══════════════════════════════════════════════
+function buildPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const W=210,M=20;
+  const hex=(CFG.color||'#4f8cff').replace('#','');
+  const cr=parseInt(hex.substring(0,2),16),cg=parseInt(hex.substring(2,4),16),cb=parseInt(hex.substring(4,6),16);
+
+  // ── Page 1 : Attestation ──
+  doc.setFillColor(cr,cg,cb); doc.rect(0,0,W,40,'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.text(CFG.name||'Établissement',W/2,14,{align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.text('SERVICE TECHNIQUE — ATTESTATION DE SIGNALEMENT',W/2,24,{align:'center'});
+  doc.setFontSize(8); doc.text(`Réf. ${lastPayload.ref}`,W/2,33,{align:'center'});
+  doc.setFillColor(62,207,142); doc.rect(0,40,W,2,'F');
+
+  let y=54;
+  doc.setTextColor(15,23,42); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  doc.text('ATTESTATION DE DÉCLARATION DE PROBLÈME',W/2,y,{align:'center'});
+  y+=6; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  doc.text(`Déclaration enregistrée le ${lastPayload.date}`,W/2,y,{align:'center'});
+  y+=14;
+
+  const block=(lbl,val,bgR=248,bgG=250,bgB=252)=>{
+    doc.setFillColor(bgR,bgG,bgB); doc.roundedRect(M,y,W-M*2,14,3,3,'F');
+    doc.setDrawColor(226,232,240); doc.roundedRect(M,y,W-M*2,14,3,3,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(cr,cg,cb);
+    doc.text(lbl.toUpperCase(),M+5,y+5.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(15,23,42);
+    doc.text(val||'—',M+5,y+11.5); y+=18;
+  };
+  const section=t=>{
+    doc.setFillColor(cr,cg,cb); doc.rect(M,y,3,8,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(cr,cg,cb);
+    doc.text(t,M+7,y+6); y+=13;
   };
 
-  // Room code
-  ['batiment','etage','salle'].forEach(id => {
-    document.getElementById(id).addEventListener('change', updateRoomCode);
-  });
+  section('IDENTIFICATION DE LA SALLE');
+  block('Code de la salle',lastPayload.salle);
+  const hw=(W-M*2-5)/2;
+  const half=(lbl,val,xOff)=>{
+    doc.setFillColor(248,250,252); doc.roundedRect(M+xOff,y,hw,14,3,3,'F');
+    doc.setDrawColor(226,232,240); doc.roundedRect(M+xOff,y,hw,14,3,3,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(cr,cg,cb);
+    doc.text(lbl.toUpperCase(),M+xOff+5,y+5.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(15,23,42);
+    doc.text(val||'—',M+xOff+5,y+11.5);
+  };
+  half('Bâtiment',`Bâtiment ${lastPayload.batiment}`,0);
+  half('Étage',`${lastPayload.etage}e étage`,hw+5); y+=18;
 
-  function updateRoomCode() {
-    const b = document.getElementById('batiment').value;
-    const e = document.getElementById('etage').value;
-    const s = document.getElementById('salle').value;
-    document.getElementById('roomCode').textContent =
-      (b && e && s) ? `${b}${e}${s}` : '—';
+  section('NATURE DU PROBLÈME');
+  block('Catégorie',lastPayload.categorie,245,243,255);
+  block('Type de problème',lastPayload.typeProbleme,255,245,245);
+
+  if(lastPayload.description&&lastPayload.description.trim()){
+    const lines=doc.splitTextToSize(lastPayload.description,W-M*2-10);
+    const h=Math.max(14,lines.length*6+8);
+    doc.setFillColor(254,252,232); doc.roundedRect(M,y,W-M*2,h,3,3,'F');
+    doc.setDrawColor(253,224,71); doc.roundedRect(M,y,W-M*2,h,3,3,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(161,98,7);
+    doc.text('DESCRIPTION COMPLÉMENTAIRE',M+5,y+5.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(15,23,42);
+    doc.text(lines,M+5,y+11); y+=h+4;
   }
 
-  // Categories
-  document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.cat;
-      document.getElementById('categorie').value = cat;
-      document.getElementById('typeProbleme').value = '';
-      renderProblems(cat);
-    });
-  });
+  y+=4; section('DÉCLARANT');
+  block('Nom du déclarant',lastPayload.declarant);
 
-  function renderProblems(cat) {
-    const wrap = document.getElementById('problemsWrap');
-    const list = document.getElementById('probList');
-    list.innerHTML = '';
-    wrap.classList.add('visible');
-    (problems[cat] || []).forEach(p => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'prob-chip';
-      chip.textContent = p;
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        document.getElementById('typeProbleme').value = p;
-      });
-      list.appendChild(chip);
-    });
+  // Signature
+  y+=4;
+  doc.setLineDashPattern([2,2],0); doc.setDrawColor(200,200,200);
+  doc.line(M,y,W-M,y); doc.setLineDashPattern([],0); y+=8;
+  doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(148,163,184);
+  doc.text('Signature (facultatif) :',M,y);
+  doc.setDrawColor(200,200,200); doc.line(M+52,y+1,W-M-20,y+1);
+
+  // Mention photos
+  if(capturedPhotos.length>0){
+    y+=12;
+    doc.setFillColor(240,249,255); doc.roundedRect(M,y,W-M*2,10,3,3,'F');
+    doc.setDrawColor(cr,cg,cb); doc.roundedRect(M,y,W-M*2,10,3,3,'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(cr,cg,cb);
+    doc.text(`📷 ${capturedPhotos.length} photo(s) jointe(s) — voir page(s) suivante(s)`,W/2,y+6.5,{align:'center'});
   }
 
-  // Submit
-  document.getElementById('reportForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const err = document.getElementById('errorMsg');
-    err.classList.remove('show');
+  // Footer page 1
+  doc.setFillColor(248,250,252); doc.rect(0,277,W,20,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(148,163,184);
+  doc.text(`${CFG.name||''} — ${lastPayload.date}`,M,285);
+  doc.text(`Réf. ${lastPayload.ref}`,W-M,285,{align:'right'});
 
-    const b = document.getElementById('batiment').value;
-    const et = document.getElementById('etage').value;
-    const s = document.getElementById('salle').value;
-    const cat = document.getElementById('categorie').value;
-    const type = document.getElementById('typeProbleme').value;
+  // ── Pages photos ──
+  if(capturedPhotos.length>0){
+    // 2 photos par page
+    const photosPerPage=2;
+    const photoH=100, photoW=W-M*2;
 
-    if (!b || !et || !s || !cat || !type) {
-      err.classList.add('show');
-      return;
+    for(let i=0;i<capturedPhotos.length;i++){
+      if(i%photosPerPage===0){
+        doc.addPage();
+        // Header page photo
+        doc.setFillColor(cr,cg,cb); doc.rect(0,0,W,18,'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+        doc.text(`${CFG.name||'Établissement'} — Photos du signalement — Salle ${lastPayload.salle}`,W/2,11,{align:'center'});
+        doc.setFillColor(62,207,142); doc.rect(0,18,W,1.5,'F');
+      }
+
+      const posOnPage=i%photosPerPage;
+      const yPhoto=24+(posOnPage*(photoH+14));
+
+      // Numéro et légende
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(cr,cg,cb);
+      doc.text(`Photo ${i+1} / ${capturedPhotos.length}`,M,yPhoto+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(148,163,184);
+      doc.text(`Salle ${lastPayload.salle} — ${lastPayload.categorie} — ${lastPayload.date}`,M,yPhoto+10);
+
+      // Cadre + image
+      doc.setDrawColor(cr,cg,cb); doc.setLineWidth(0.5);
+      doc.roundedRect(M,yPhoto+12,photoW,photoH-12,3,3,'S');
+      try{
+        doc.addImage(capturedPhotos[i],'JPEG',M+1,yPhoto+13,photoW-2,photoH-14);
+      }catch(e){
+        doc.setFontSize(10); doc.setTextColor(200,200,200);
+        doc.text('Image non disponible',W/2,yPhoto+photoH/2,{align:'center'});
+      }
+
+      // Footer photo page
+      if(posOnPage===photosPerPage-1||i===capturedPhotos.length-1){
+        doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(180,180,180);
+        doc.text(`Réf. ${lastPayload.ref} — Page ${Math.floor(i/photosPerPage)+2}`,W/2,292,{align:'center'});
+      }
     }
+  }
 
-    const roomCode = `${b}${et}${s}`;
-    const btn = document.getElementById('submitBtn');
-    const btnText = document.getElementById('btnText');
-    const spinner = document.getElementById('spinner');
+  return doc;
+}
 
-    btn.disabled = true;
-    btnText.style.display = 'none';
-    spinner.style.display = 'block';
+// ══════════════════════════════════════════════
+// SUBMIT
+// ══════════════════════════════════════════════
+function genRef(){
+  const now=new Date(),pad=n=>String(n).padStart(2,'0');
+  return `SIG-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${Math.floor(Math.random()*9000+1000)}`;
+}
 
-    lastRef = genRef();
-    lastPayload = {
-      salle: roomCode,
-      batiment: b,
-      etage: et,
-      numerosalle: s,
-      categorie: cat,
-      typeProbleme: type,
-      description: document.getElementById('description').value,
-      declarant: document.getElementById('declarant').value || 'Anonyme',
-      date: new Date().toLocaleString('fr-FR'),
-      ref: lastRef
-    };
+async function submitForm(){
+  document.getElementById('errorMsg').classList.remove('show');
+  const b=document.getElementById('selBatiment').value,
+        e=document.getElementById('selEtage').value,
+        s=document.getElementById('selSalle').value,
+        cat=document.getElementById('categorie').value,
+        typ=document.getElementById('typeProbleme').value;
+  if(!b||!e||!s||!cat||!typ){document.getElementById('errorMsg').classList.add('show');return;}
 
-    const payload = { ...lastPayload };
+  const btn=document.getElementById('submitBtn'),btnText=document.getElementById('btnText'),spinner=document.getElementById('spinner');
+  btn.disabled=true; btnText.style.display='none'; spinner.style.display='block';
 
-    try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+  // Stop camera if running
+  if(cameraStream) stopCamera();
+
+  lastRef=genRef();
+  lastPayload={
+    salle:`${b}${e}${s}`,batiment:b,etage:e,numerosalle:s,
+    categorie:cat,typeProbleme:typ,
+    description:document.getElementById('description').value,
+    declarant:document.getElementById('declarant').value||'Anonyme',
+    date:new Date().toLocaleString('fr-FR'),
+    ref:lastRef,emailAlert:CFG.email,etablissement:CFG.name,
+    photoCount:capturedPhotos.length
+  };
+
+  // Générer le PDF
+  const doc=buildPDF();
+  lastPdfBlob=doc.output('blob');
+
+  // Convertir PDF en base64 pour envoi
+  const pdfBase64=await blobToBase64(lastPdfBlob);
+
+  // Payload avec photos et PDF
+  const sendPayload={
+    ...lastPayload,
+    photos: capturedPhotos,          // array de dataURLs
+    pdfBase64: pdfBase64.split(',')[1] // base64 sans le préfixe data:
+  };
+
+  if(CFG.scriptUrl){
+    try{
+      await fetch(CFG.scriptUrl,{
+        method:'POST',mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(sendPayload)
       });
-    } catch(err) {
-      console.log('Envoi effectué (no-cors)');
-    }
+    }catch(err){console.log('Envoi effectué');}
+  }
 
-    btn.disabled = false;
-    btnText.style.display = 'block';
-    spinner.style.display = 'none';
+  btn.disabled=false; btnText.style.display='block'; spinner.style.display='none';
+  document.getElementById('successRoom').textContent=lastPayload.salle;
+  document.getElementById('refNumber').textContent=`Réf. ${lastRef}`;
+  document.getElementById('successPhotosInfo').textContent=
+    capturedPhotos.length>0 ? `📷 ${capturedPhotos.length} photo(s) incluse(s) dans le PDF` : '';
+  document.getElementById('successOverlay').classList.add('show');
+}
 
-    document.getElementById('successRoom').textContent = roomCode;
-    document.getElementById('refNumber').textContent = `Réf. ${lastRef}`;
-    document.getElementById('successOverlay').classList.add('show');
-  });
+function blobToBase64(blob){
+  return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob);});
+}
 
-  // Génération PDF
-  document.getElementById('btnPdf').addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const W = 210, margin = 20;
+// ══════════════════════════════════════════════
+// BOUTON PDF (téléchargement local)
+// ══════════════════════════════════════════════
+document.getElementById('btnPdf').addEventListener('click',()=>{
+  if(lastPdfBlob){
+    const url=URL.createObjectURL(lastPdfBlob);
+    const a=document.createElement('a'); a.href=url;
+    a.download=`attestation-${lastPayload.salle}-${lastPayload.ref}.pdf`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }
+});
 
-    // Bandeau bleu en-tête
-    doc.setFillColor(30, 58, 138);
-    doc.rect(0, 0, W, 38, 'F');
+// ══════════════════════════════════════════════
+// RESET
+// ══════════════════════════════════════════════
+function resetForm(){
+  document.getElementById('selBatiment').value='';
+  document.getElementById('selEtage').innerHTML='<option value="">—</option>';
+  document.getElementById('selSalle').value='';
+  document.getElementById('roomCode').textContent='—';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.prob-chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('problemsWrap').classList.remove('visible');
+  document.getElementById('categorie').value='';
+  document.getElementById('typeProbleme').value='';
+  document.getElementById('description').value='';
+  document.getElementById('declarant').value='';
+  // Reset photos
+  capturedPhotos=[];
+  if(cameraStream) stopCamera();
+  renderPhotoGrid();
+}
 
-    // Titre établissement
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text(NOM_ETABLISSEMENT, W / 2, 15, { align: 'center' });
+document.getElementById('btnNew').addEventListener('click',()=>{
+  document.getElementById('successOverlay').classList.remove('show');
+  resetForm();
+});
 
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('SERVICE TECHNIQUE — ATTESTATION DE SIGNALEMENT', W / 2, 24, { align: 'center' });
-
-    doc.setFontSize(9);
-    doc.text(`Réf. ${lastPayload.ref}`, W / 2, 32, { align: 'center' });
-
-    // Bandeau vert sous le header
-    doc.setFillColor(62, 207, 142);
-    doc.rect(0, 38, W, 2, 'F');
-
-    let y = 55;
-
-    // Titre attestation
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text('ATTESTATION DE DÉCLARATION DE PROBLÈME', W / 2, y, { align: 'center' });
-    y += 6;
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 116, 139);
-    doc.text(`Déclaration enregistrée le ${lastPayload.date}`, W / 2, y, { align: 'center' });
-    y += 14;
-
-    // Fonction bloc info
-    const drawBlock = (label, value, color = [30, 58, 138]) => {
-      doc.setFillColor(248, 250, 252);
-      doc.roundedRect(margin, y, W - margin * 2, 14, 3, 3, 'F');
-      doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(margin, y, W - margin * 2, 14, 3, 3, 'S');
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(...color);
-      doc.text(label.toUpperCase(), margin + 5, y + 5.5);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(15, 23, 42);
-      doc.text(value || '—', margin + 5, y + 11.5);
-      y += 18;
-    };
-
-    // Séparateur section
-    const drawSection = (title) => {
-      doc.setFillColor(30, 58, 138);
-      doc.rect(margin, y, 3, 8, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(30, 58, 138);
-      doc.text(title, margin + 7, y + 6);
-      y += 13;
-    };
-
-    drawSection('IDENTIFICATION DE LA SALLE');
-    drawBlock('Code de la salle', lastPayload.salle, [30, 58, 138]);
-
-    // Grille bâtiment / étage côte à côte
-    const halfW = (W - margin * 2 - 5) / 2;
-    const drawHalf = (label, value, xOff) => {
-      doc.setFillColor(248, 250, 252);
-      doc.roundedRect(margin + xOff, y, halfW, 14, 3, 3, 'F');
-      doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(margin + xOff, y, halfW, 14, 3, 3, 'S');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(30, 58, 138);
-      doc.text(label.toUpperCase(), margin + xOff + 5, y + 5.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(15, 23, 42);
-      doc.text(value || '—', margin + xOff + 5, y + 11.5);
-    };
-    drawHalf('Bâtiment', `Bâtiment ${lastPayload.batiment}`, 0);
-    drawHalf('Étage', `${lastPayload.etage}e étage`, halfW + 5);
-    y += 18;
-
-    drawSection('NATURE DU PROBLÈME');
-    drawBlock('Catégorie', lastPayload.categorie, [99, 102, 241]);
-    drawBlock('Type de problème', lastPayload.typeProbleme, [239, 68, 68]);
-
-    if (lastPayload.description) {
-      // Bloc description multi-ligne
-      doc.setFillColor(254, 252, 232);
-      const descLines = doc.splitTextToSize(lastPayload.description, W - margin * 2 - 10);
-      const descH = Math.max(14, descLines.length * 6 + 8);
-      doc.roundedRect(margin, y, W - margin * 2, descH, 3, 3, 'F');
-      doc.setDrawColor(253, 224, 71);
-      doc.roundedRect(margin, y, W - margin * 2, descH, 3, 3, 'S');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(161, 98, 7);
-      doc.text('DESCRIPTION COMPLÉMENTAIRE', margin + 5, y + 5.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(15, 23, 42);
-      doc.text(descLines, margin + 5, y + 11);
-      y += descH + 4;
-    }
-
-    y += 4;
-    drawSection('DÉCLARANT');
-    drawBlock('Nom du déclarant', lastPayload.declarant);
-
-    // Zone signature
-    y += 4;
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineDashPattern([2, 2], 0);
-    doc.line(margin, y, W - margin, y);
-    doc.setLineDashPattern([], 0);
-    y += 8;
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(9);
-    doc.setTextColor(148, 163, 184);
-    doc.text('Signature du déclarant (facultatif) :', margin, y);
-    doc.line(margin + 70, y + 1, W - margin - 20, y + 1);
-    y += 16;
-
-    // Pied de page
-    doc.setFillColor(248, 250, 252);
-    doc.rect(0, 277, W, 20, 'F');
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(148, 163, 184);
-    doc.text(`Document généré automatiquement — ${lastPayload.date}`, margin, 285);
-    doc.text(`Réf. ${lastPayload.ref}`, W - margin, 285, { align: 'right' });
-
-    doc.save(`attestation-${lastPayload.salle}-${lastPayload.ref}.pdf`);
-  });
-
-  document.getElementById('btnNew').addEventListener('click', () => {
-    document.getElementById('successOverlay').classList.remove('show');
-    document.getElementById('reportForm').reset();
-    document.getElementById('roomCode').textContent = '—';
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
-    document.getElementById('problemsWrap').classList.remove('visible');
-    document.getElementById('categorie').value = '';
-    document.getElementById('typeProbleme').value = '';
-  });
+// ══════════════════════════════════════════════
+// DÉMARRAGE
+// ══════════════════════════════════════════════
+if(loadConfig()&&CFG.name){
+  initApp();
+}else{
+  document.getElementById('cfgName').value='Lycée Français Pierre Loti';
+  document.getElementById('cfgCity').value='Istanbul · Turquie';
+  document.getElementById('cfgLogoUrl').value='https://raw.githubusercontent.com/xseorkly/photoeleve/refs/heads/main/logo.jpeg';
+  document.getElementById('cfgCategories').value=DEFAULT_CATEGORIES;
+  document.getElementById('cfgRooms').value='01,02,03,04,05,06,07,08,09,10';
+  const p=document.getElementById('setupLogoPreview');
+  p.src='https://raw.githubusercontent.com/xseorkly/photoeleve/refs/heads/main/logo.jpeg';
+  p.style.display='block';
+  renderBuildingList();
+  document.getElementById('setupScreen').style.display='flex';
+}
 </script>
 </body>
 </html>
